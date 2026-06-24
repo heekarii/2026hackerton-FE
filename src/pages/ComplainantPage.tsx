@@ -8,11 +8,12 @@ import {
   Star,
   UserRound,
 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
-import { clearAccessToken } from '@/features/auth/auth-storage'
+import { type AuthUser, clearAccessToken, getAuthUser, saveAuthUser } from '@/features/auth/auth-storage'
+import { apiRequest } from '@/shared/api/client'
 import { cn } from '@/lib/utils'
 
 type ComplaintStatus = 'received' | 'processing' | 'completed'
@@ -91,13 +92,6 @@ const initialComplaints: Complaint[] = [
   },
 ]
 
-const user = {
-  name: '김민서',
-  email: 'minseo@university.ac.kr',
-  department: '컴퓨터공학과',
-  studentId: '20261234',
-}
-
 function getStatusIndex(status: ComplaintStatus) {
   return statusSteps.findIndex((step) => step.key === status)
 }
@@ -105,6 +99,28 @@ function getStatusIndex(status: ComplaintStatus) {
 export function ComplainantPage() {
   const navigate = useNavigate()
   const [complaints, setComplaints] = useState(initialComplaints)
+  const [user, setUser] = useState<AuthUser | null>(() => getAuthUser())
+
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        const response = await apiRequest<{ user: AuthUser }>('/me')
+        if (response.user) {
+          saveAuthUser(response.user)
+          setUser(response.user)
+        }
+      } catch {
+        // 로그인 응답으로 저장한 정보를 우선 보여주고, 새로고침 시에도 화면을 유지합니다.
+      }
+    }
+
+    void loadUser()
+  }, [])
+
+  const displayName = user?.name ?? user?.nickname ?? '이름 미등록'
+  const displayDepartment = user?.department ?? '학과 미등록'
+  const displayStudentId = user?.student_id ?? '학번 미등록'
+  const displayEmail = user?.email ?? '이메일 미등록'
 
   const completedCount = useMemo(
     () => complaints.filter((complaint) => complaint.status === 'completed').length,
@@ -153,19 +169,19 @@ export function ComplainantPage() {
                 <UserRound className="size-6" aria-hidden="true" />
               </span>
               <div>
-                <h2 className="font-bold text-slate-950">{user.name}</h2>
-                <p className="text-sm text-slate-500">{user.department}</p>
+                <h2 className="font-bold text-slate-950">{displayName}</h2>
+                <p className="text-sm text-slate-500">{displayDepartment}</p>
               </div>
             </div>
 
             <dl className="mt-5 space-y-3 text-sm">
               <div className="flex items-center justify-between gap-4">
                 <dt className="text-slate-500">학번</dt>
-                <dd className="font-medium text-slate-800">{user.studentId}</dd>
+                <dd className="font-medium text-slate-800">{displayStudentId}</dd>
               </div>
               <div className="flex items-center justify-between gap-4">
                 <dt className="text-slate-500">이메일</dt>
-                <dd className="min-w-0 truncate text-right font-medium text-slate-800">{user.email}</dd>
+                <dd className="min-w-0 truncate text-right font-medium text-slate-800">{displayEmail}</dd>
               </div>
             </dl>
           </section>

@@ -22,7 +22,9 @@ function isValidEmail(email: string) {
 
 export function SignupForm({ onSuccess }: SignupFormProps) {
   const [email, setEmail] = useState('')
-  const [nickname, setNickname] = useState('')
+  const [name, setName] = useState('')
+  const [studentId, setStudentId] = useState('')
+  const [department, setDepartment] = useState('')
   const [password, setPassword] = useState('')
   const [passwordConfirmation, setPasswordConfirmation] = useState('')
   const [agreedToTerms, setAgreedToTerms] = useState(false)
@@ -38,8 +40,18 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
       return
     }
 
-    if (!nickname.trim()) {
-      setFormError('서비스에서 사용할 닉네임을 입력해 주세요.')
+    if (!name.trim()) {
+      setFormError('이름을 입력해 주세요.')
+      return
+    }
+
+    if (!studentId.trim()) {
+      setFormError('학번을 입력해 주세요.')
+      return
+    }
+
+    if (!department.trim()) {
+      setFormError('학과를 입력해 주세요.')
       return
     }
 
@@ -63,8 +75,11 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
     try {
       await signup({
         email: email.trim(),
-        nickname: nickname.trim(),
         password,
+        name: name.trim(),
+        student_id: studentId.trim(),
+        department: department.trim(),
+        nickname: name.trim(),
       })
       onSuccess()
     } catch (error) {
@@ -101,13 +116,36 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
 
       <fieldset className="space-y-5">
         <div className="space-y-2">
-          <Label htmlFor="nickname">닉네임</Label>
+          <Label htmlFor="name">이름</Label>
           <Input
-            id="nickname"
-            autoComplete="nickname"
-            placeholder="서비스에서 사용할 이름을 입력하세요"
-            value={nickname}
-            onChange={(event) => setNickname(event.target.value)}
+            id="name"
+            autoComplete="name"
+            placeholder="이름을 입력하세요"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="student-id">학번</Label>
+          <Input
+            id="student-id"
+            autoComplete="off"
+            inputMode="numeric"
+            placeholder="학번을 입력하세요"
+            value={studentId}
+            onChange={(event) => setStudentId(event.target.value)}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="department">학과</Label>
+          <Input
+            id="department"
+            autoComplete="organization"
+            placeholder="예: 컴퓨터공학과"
+            value={department}
+            onChange={(event) => setDepartment(event.target.value)}
           />
         </div>
 

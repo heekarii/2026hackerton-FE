@@ -2,7 +2,7 @@ import { ApiError } from './api-error'
 
 type JsonBody = Record<string, unknown>
 
-const mockUser = {
+let mockUser = {
   id: 1,
   name: '김민서',
   nickname: '민서',
@@ -130,10 +130,22 @@ export async function mockApiRequest<T>(path: string, options: RequestInit = {})
   }
 
   if (method === 'POST' && path === '/auth/signup') {
+    mockUser = {
+      ...mockUser,
+      name: typeof body.name === 'string' ? body.name : mockUser.name,
+      nickname: typeof body.nickname === 'string' ? body.nickname : mockUser.nickname,
+      email: typeof body.email === 'string' ? body.email : mockUser.email,
+      department: typeof body.department === 'string' ? body.department : mockUser.department,
+      student_id: typeof body.student_id === 'string' ? body.student_id : mockUser.student_id,
+    }
+
     return {
       id: 2,
       email: body.email,
-      nickname: body.nickname,
+      name: mockUser.name,
+      nickname: mockUser.nickname,
+      department: mockUser.department,
+      student_id: mockUser.student_id,
       message: '회원가입이 완료되었습니다.',
     } as T
   }
