@@ -12,8 +12,14 @@ import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
 import { SejongUniversityLogo } from '@/components/SejongUniversityLogo'
-import { clearAccessToken } from '@/features/auth/auth-storage'
+import {
+  clearAccessToken,
+  getAuthUser,
+  saveAuthUser,
+  type AuthUser,
+} from '@/features/auth/auth-storage'
 import { cn } from '@/lib/utils'
+import { apiRequest } from '@/shared/api/client'
 
 type ComplaintStatus = 'received' | 'processing' | 'completed'
 
@@ -103,11 +109,9 @@ export function ComplainantPage() {
   useEffect(() => {
     async function loadUser() {
       try {
-        const response = await apiRequest<{ user: AuthUser }>('/me')
-        if (response.user) {
-          saveAuthUser(response.user)
-          setUser(response.user)
-        }
+        const response = await apiRequest<AuthUser>('/auth/me')
+        saveAuthUser(response)
+        setUser(response)
       } catch {
         // 로그인 응답으로 저장한 정보를 우선 보여주고, 새로고침 시에도 화면을 유지합니다.
       }

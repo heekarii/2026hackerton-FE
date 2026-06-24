@@ -79,7 +79,6 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
         name: name.trim(),
         student_id: studentId.trim(),
         department: department.trim(),
-        nickname: name.trim(),
       })
       onSuccess()
     } catch (error) {

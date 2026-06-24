@@ -6,8 +6,6 @@ export type SignupPayload = {
   name: string
   student_id: string
   department: string
-  // 현재 백엔드의 nickname 필수값과 호환을 유지합니다.
-  nickname: string
 }
 
 export async function signup(payload: SignupPayload) {
