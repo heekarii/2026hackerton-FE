@@ -3,6 +3,7 @@ import type { ChangeEvent, FormEvent } from 'react'
 import '@/App.css'
 
 import { apiRequest } from '@/shared/api/client'
+import { createComplaint } from '@/features/complaints/api/complaints'
 
 const categories = [
   '시설',
@@ -18,6 +19,7 @@ type Category = (typeof categories)[number]
 type FormState = {
   title: string
   category: Category
+  location: string
   occurrenceAt: string
   complaint: string
   improvement: string
@@ -36,6 +38,7 @@ type ImagePreview = {
 const initialForm: FormState = {
   title: '',
   category: '시설',
+  location: '',
   occurrenceAt: '',
   complaint: '',
   improvement: '',
@@ -59,6 +62,7 @@ export function ComplaintPage() {
   const isReadyToSubmit = useMemo(
     () =>
       form.title.trim().length > 0 &&
+      form.location.trim().length > 0 &&
       form.occurrenceAt.length > 0 &&
       form.complaint.trim().length >= 10 &&
       form.improvement.trim().length >= 5,
@@ -98,12 +102,11 @@ export function ComplaintPage() {
 
     const payload = {
       title: form.title.trim(),
-      category: form.category,
+      content: form.complaint.trim(),
+      desired_solution: form.improvement.trim(),
+      location_name: form.location.trim(),
       occurred_at: new Date(form.occurrenceAt).toISOString(),
-      complaint_content: form.complaint.trim(),
-      desired_improvement: form.improvement.trim(),
       is_anonymous: form.isAnonymous,
-      image_names: images.map((image) => image.name),
     }
 
     try {
@@ -114,6 +117,7 @@ export function ComplaintPage() {
         },
         body: JSON.stringify(payload),
       })
+      await createComplaint(payload)
 
       setStatus('success')
       setMessage('민원이 등록됐어요. AI가 분류, 요약, 유사 민원을 분석합니다.')
@@ -167,6 +171,15 @@ export function ComplaintPage() {
                   <option key={category}>{category}</option>
                 ))}
               </select>
+            </label>
+
+            <label className="field">
+              <span>발생 장소</span>
+              <input
+                value={form.location}
+                onChange={(event) => updateForm('location', event.target.value)}
+                placeholder="예: 학생회관 1층"
+              />
             </label>
 
             <label className="field">

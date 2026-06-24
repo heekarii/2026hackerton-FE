@@ -46,6 +46,7 @@ export async function apiRequest<T>(path: string, options: RequestInit = {}): Pr
       credentials: 'include',
       headers: {
         Accept: 'application/json',
+        ...(getAccessToken() ? { Authorization: `Bearer ${getAccessToken()}` } : {}),
         ...options.headers,
       },
     })
@@ -56,7 +57,13 @@ export async function apiRequest<T>(path: string, options: RequestInit = {}): Pr
   }
 
   const responseText = await response.text()
-  const payload: unknown = responseText ? JSON.parse(responseText) : undefined
+  let payload: unknown
+
+  try {
+    payload = responseText ? JSON.parse(responseText) : undefined
+  } catch {
+    payload = undefined
+  }
 
   if (!response.ok) {
     throw new ApiError(
@@ -67,3 +74,4 @@ export async function apiRequest<T>(path: string, options: RequestInit = {}): Pr
 
   return payload as T
 }
+import { getAccessToken } from '@/features/auth/auth-storage'

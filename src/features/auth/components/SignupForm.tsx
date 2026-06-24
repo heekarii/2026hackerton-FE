@@ -1,4 +1,4 @@
-import { BadgeCheck, CheckCircle2, LoaderCircle, Mail, TriangleAlert } from 'lucide-react'
+import { LoaderCircle, Mail, TriangleAlert } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -6,13 +6,11 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ApiError } from '@/shared/api/client'
 
-import { sendVerificationCode, signup, verifyEmailCode } from '../api/signup'
+import { signup } from '../api/signup'
 
 type SignupFormProps = {
   onSuccess: () => void
 }
-
-type VerificationStatus = 'idle' | 'sent' | 'verified'
 
 function getErrorMessage(error: unknown) {
   return error instanceof ApiError ? error.message : '요청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.'
@@ -24,78 +22,19 @@ function isValidEmail(email: string) {
 
 export function SignupForm({ onSuccess }: SignupFormProps) {
   const [email, setEmail] = useState('')
-  const [verificationCode, setVerificationCode] = useState('')
-  const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>('idle')
-  const [verificationToken, setVerificationToken] = useState<string | undefined>()
   const [nickname, setNickname] = useState('')
   const [password, setPassword] = useState('')
   const [passwordConfirmation, setPasswordConfirmation] = useState('')
   const [agreedToTerms, setAgreedToTerms] = useState(false)
   const [formError, setFormError] = useState('')
-  const [notice, setNotice] = useState('')
-  const [isSendingCode, setIsSendingCode] = useState(false)
-  const [isVerifyingCode, setIsVerifyingCode] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-
-  function resetVerification() {
-    setVerificationStatus('idle')
-    setVerificationCode('')
-    setVerificationToken(undefined)
-    setNotice('')
-  }
-
-  async function handleSendCode() {
-    setFormError('')
-    setNotice('')
-
-    if (!isValidEmail(email.trim())) {
-      setFormError('학교 이메일 형식을 확인해 주세요.')
-      return
-    }
-
-    setIsSendingCode(true)
-
-    try {
-      const response = await sendVerificationCode(email.trim())
-      setVerificationStatus('sent')
-      setNotice(response.message ?? '인증번호를 이메일로 보냈습니다. 받은 편지함을 확인해 주세요.')
-    } catch (error) {
-      setFormError(getErrorMessage(error))
-    } finally {
-      setIsSendingCode(false)
-    }
-  }
-
-  async function handleVerifyCode() {
-    setFormError('')
-    setNotice('')
-
-    if (!verificationCode.trim()) {
-      setFormError('이메일로 받은 인증번호를 입력해 주세요.')
-      return
-    }
-
-    setIsVerifyingCode(true)
-
-    try {
-      const response = await verifyEmailCode(email.trim(), verificationCode.trim())
-      setVerificationToken(response.verification_token)
-      setVerificationStatus('verified')
-      setNotice('학교 이메일 인증이 완료되었습니다.')
-    } catch (error) {
-      setFormError(getErrorMessage(error))
-    } finally {
-      setIsVerifyingCode(false)
-    }
-  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setFormError('')
-    setNotice('')
 
-    if (verificationStatus !== 'verified') {
-      setFormError('학교 이메일 인증을 먼저 완료해 주세요.')
+    if (!isValidEmail(email.trim())) {
+      setFormError('이메일 형식을 확인해 주세요.')
       return
     }
 
@@ -126,7 +65,6 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
         email: email.trim(),
         nickname: nickname.trim(),
         password,
-        verification_token: verificationToken,
       })
       onSuccess()
     } catch (error) {
@@ -135,9 +73,6 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
       setIsSubmitting(false)
     }
   }
-
-  const isEmailLocked = verificationStatus !== 'idle'
-  const isVerified = verificationStatus === 'verified'
 
   return (
     <form className="mt-7 space-y-6" noValidate onSubmit={handleSubmit}>
@@ -148,74 +83,23 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
         </div>
       )}
 
-      {notice && (
-        <div className="flex gap-3 rounded-xl border border-teal-200 bg-teal-50 px-3.5 py-3 text-sm text-teal-800" role="status">
-          <CheckCircle2 className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-          <p>{notice}</p>
-        </div>
-      )}
-
       <section className="space-y-3">
-        <div className="flex items-center justify-between gap-3">
-          <Label htmlFor="signup-email">학교 이메일</Label>
-          {isVerified ? (
-            <span className="inline-flex items-center gap-1 text-xs font-semibold text-teal-700">
-              <BadgeCheck className="size-3.5" aria-hidden="true" /> 인증 완료
-            </span>
-          ) : null}
+        <Label htmlFor="signup-email">이메일</Label>
+        <div className="relative">
+          <Mail className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+          <Input
+            id="signup-email"
+            type="email"
+            autoComplete="email"
+            placeholder="이메일을 입력하세요"
+            value={email}
+            className="pl-10"
+            onChange={(event) => setEmail(event.target.value)}
+          />
         </div>
-        <div className="flex gap-2">
-          <div className="relative min-w-0 flex-1">
-            <Mail className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
-            <Input
-              id="signup-email"
-              type="email"
-              autoComplete="email"
-              placeholder="name@university.ac.kr"
-              value={email}
-              disabled={isEmailLocked}
-              className="pl-10"
-              onChange={(event) => {
-                setEmail(event.target.value)
-                resetVerification()
-              }}
-            />
-          </div>
-          {isEmailLocked ? (
-            <Button type="button" variant="outline" onClick={resetVerification}>
-              변경
-            </Button>
-          ) : (
-            <Button type="button" variant="outline" disabled={isSendingCode} onClick={handleSendCode}>
-              {isSendingCode ? <LoaderCircle className="animate-spin" aria-hidden="true" /> : null}
-              인증번호 받기
-            </Button>
-          )}
-        </div>
-        <p className="text-xs leading-5 text-slate-400">소속 학교의 이메일로만 가입할 수 있습니다.</p>
       </section>
 
-      {verificationStatus === 'sent' && (
-        <section className="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <Label htmlFor="verification-code">이메일 인증번호</Label>
-          <div className="flex gap-2">
-            <Input
-              id="verification-code"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              placeholder="이메일로 받은 인증번호 입력"
-              value={verificationCode}
-              onChange={(event) => setVerificationCode(event.target.value)}
-            />
-            <Button type="button" disabled={isVerifyingCode} onClick={handleVerifyCode}>
-              {isVerifyingCode ? <LoaderCircle className="animate-spin" aria-hidden="true" /> : null}
-              확인
-            </Button>
-          </div>
-        </section>
-      )}
-
-      <fieldset disabled={!isVerified} className="space-y-5 disabled:opacity-45">
+      <fieldset className="space-y-5">
         <div className="space-y-2">
           <Label htmlFor="nickname">닉네임</Label>
           <Input

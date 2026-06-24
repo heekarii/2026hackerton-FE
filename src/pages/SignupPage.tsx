@@ -23,18 +23,18 @@ export function SignupPage() {
           <div className="grid size-14 place-items-center rounded-2xl bg-white/10 ring-1 ring-white/10">
             <MailCheck className="size-7 text-teal-200" aria-hidden="true" />
           </div>
-          <p className="mt-8 text-sm font-bold tracking-[0.2em] text-teal-200">SCHOOL EMAIL VERIFY</p>
+          <p className="mt-8 text-sm font-bold tracking-[0.2em] text-teal-200">CREATE YOUR ACCOUNT</p>
           <h1 className="mt-4 text-5xl leading-[1.12] font-bold tracking-[-0.055em] text-balance">
-            학교 이메일로,
+            간단한 정보 입력으로,
             <br />
-            더 안전하게 시작하세요
+            바로 시작하세요
           </h1>
           <p className="mt-7 text-lg leading-8 text-teal-100/80">
-            학교 구성원 인증을 통해 신뢰할 수 있는 민원 소통 공간을 함께 만듭니다.
+            이메일과 닉네임, 비밀번호만 입력하면 캠퍼스 민원 서비스를 이용할 수 있습니다.
           </p>
           <div className="mt-10 flex items-center gap-3 text-sm text-teal-100/85">
             <ShieldCheck className="size-5 text-teal-200" aria-hidden="true" />
-            인증 정보는 안전하게 처리됩니다.
+            회원 정보는 안전하게 처리됩니다.
           </div>
         </div>
       </section>
