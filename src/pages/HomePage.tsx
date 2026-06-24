@@ -1052,7 +1052,7 @@ function HomePage() {
           </label>
         </div>
 
-        <div className="mt-6 grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="mt-6 grid gap-5">
           <section className="min-w-0 rounded-lg border border-slate-200 p-4">
             <div className="flex items-center justify-between gap-3">
               <div>
@@ -1081,7 +1081,12 @@ function HomePage() {
               <div className="rounded-md bg-teal-50 p-3"><p className="text-xs font-bold text-teal-700">권장 조치</p><p className="mt-1 text-lg font-black text-teal-950">순찰 인력 증원</p></div>
             </div>
           </section>
+        </div>
+      </section>
 
+      <section className="rounded-lg border border-slate-200 bg-white p-5">
+        <div className="flex items-center justify-between gap-3"><div><p className="text-sm font-semibold text-slate-500">캠퍼스 맵</p><h2 className="mt-1 text-lg font-black">건물별 민원 핫스팟</h2></div><MapPin className="size-5 text-slate-400" aria-hidden="true" /></div>
+        <div className="mt-5 grid gap-5 lg:grid-cols-[320px_minmax(0,1fr)] xl:grid-cols-[360px_minmax(0,1fr)]">
           <section className="rounded-lg border border-slate-200 bg-slate-950 p-5 text-white">
             <p className="text-sm font-semibold text-teal-200">선택 핫스팟</p>
             <h3 className="mt-1 text-2xl font-black">{selectedHotspot.name} <span className="text-slate-400">{selectedHotspot.building}</span></h3>
@@ -1095,35 +1100,34 @@ function HomePage() {
               현장 조치 워크플로우
             </Button>
           </section>
-        </div>
-      </section>
 
-      <section className="rounded-lg border border-slate-200 bg-white p-5">
-        <div className="flex items-center justify-between gap-3"><div><p className="text-sm font-semibold text-slate-500">캠퍼스 맵</p><h2 className="mt-1 text-lg font-black">건물별 민원 핫스팟</h2></div><MapPin className="size-5 text-slate-400" aria-hidden="true" /></div>
-        <div className="relative mt-5 aspect-[527/458] overflow-hidden rounded-lg border border-slate-200 bg-[#edf3ea]">
-          <img src="/campus-map.png" alt="캠퍼스 건물 배치도와 민원 핫스팟" className="absolute inset-0 size-full object-contain" />
-          {visibleHotspots.map((spot) => {
-            const isActive = selectedHotspot.name === spot.name
-            return (
-              <button
-                key={spot.name}
-                className="absolute -translate-x-1/2 -translate-y-1/2"
-                style={{ left: spot.x, top: spot.y }}
-                type="button"
-                aria-label={`${spot.name} ${spot.building}, 민원 ${spot.count}건 선택`}
-                aria-pressed={isActive}
-                onClick={() => setSelectedHotspot(spot)}
-              >
-                {isActive ? <span className="absolute inset-0 size-10 animate-ping rounded-full bg-rose-500/30" /> : null}
-                <span className={cn('relative grid size-9 place-items-center rounded-full border-2 border-white text-xs font-black text-white shadow-lg', isActive ? 'bg-rose-600 shadow-rose-700/30' : 'bg-slate-900/85')}>
-                  {spot.count}
-                </span>
-              </button>
-            )
-          })}
-        </div>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {visibleHotspots.map((spot) => <button key={spot.name} type="button" onClick={() => setSelectedHotspot(spot)} className={cn('rounded-md border px-3 py-2 text-xs font-bold', selectedHotspot.name === spot.name ? 'border-teal-700 bg-teal-50 text-teal-800' : 'border-slate-200 text-slate-600 hover:bg-slate-50')}>{spot.name} {spot.count}건</button>)}
+          <div className="min-w-0">
+            <div className="relative aspect-[527/458] overflow-hidden rounded-lg border border-slate-200 bg-[#edf3ea]">
+              <img src="/campus-map.png" alt="캠퍼스 건물 배치도와 민원 핫스팟" className="absolute inset-0 size-full object-contain" />
+              {visibleHotspots.map((spot) => {
+                const isActive = selectedHotspot.name === spot.name
+                return (
+                  <button
+                    key={spot.name}
+                    className="absolute -translate-x-1/2 -translate-y-1/2"
+                    style={{ left: spot.x, top: spot.y }}
+                    type="button"
+                    aria-label={`${spot.name} ${spot.building}, 민원 ${spot.count}건 선택`}
+                    aria-pressed={isActive}
+                    onClick={() => setSelectedHotspot(spot)}
+                  >
+                    {isActive ? <span className="absolute inset-0 size-10 animate-ping rounded-full bg-rose-500/30" /> : null}
+                    <span className={cn('relative grid size-9 place-items-center rounded-full border-2 border-white text-xs font-black text-white shadow-lg', isActive ? 'bg-rose-600 shadow-rose-700/30' : 'bg-slate-900/85')}>
+                      {spot.count}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {visibleHotspots.map((spot) => <button key={spot.name} type="button" onClick={() => setSelectedHotspot(spot)} className={cn('rounded-md border px-3 py-2 text-xs font-bold', selectedHotspot.name === spot.name ? 'border-teal-700 bg-teal-50 text-teal-800' : 'border-slate-200 text-slate-600 hover:bg-slate-50')}>{spot.name} {spot.count}건</button>)}
+            </div>
+          </div>
         </div>
       </section>
     </div>
