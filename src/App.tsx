@@ -259,20 +259,6 @@ function App() {
             </label>
           </div>
 
-          <div className="ai-summary">
-            <p>AI 분석 예상 입력</p>
-            <dl>
-              <div>
-                <dt>분류</dt>
-                <dd>{form.category}</dd>
-              </div>
-              <div>
-                <dt>사진</dt>
-                <dd>{images.length}장</dd>
-              </div>
-            </dl>
-          </div>
-
           {message && (
             <p className={`submit-message submit-message-${status}`}>
               {message}
