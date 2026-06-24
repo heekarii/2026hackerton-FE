@@ -1,4 +1,3 @@
-import { getAccessToken } from '@/features/auth/auth-storage'
 import { apiRequest } from '@/shared/api/client'
 
 export type ComplaintAnalysis = {
@@ -16,13 +15,10 @@ export type ComplaintAnalysis = {
 }
 
 export async function analyzeComplaint(text: string) {
-  const accessToken = getAccessToken()
-
   return apiRequest<ComplaintAnalysis>('/openai/analyze', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
     },
     body: JSON.stringify({ text }),
   })

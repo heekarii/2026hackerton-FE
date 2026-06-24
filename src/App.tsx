@@ -6,8 +6,6 @@ import { SignupPage } from '@/pages/SignupPage'
 import { ComplaintPage } from '@/pages/ComplaintPage'
 import { ComplainantPage } from '@/pages/ComplainantPage'
 
-export const API_BASE_URL = 'https://two026hackerton-be.onrender.com'
-
 export const categories = [
   '시설',
   '수업 환경',
