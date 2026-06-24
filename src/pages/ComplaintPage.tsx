@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import '@/App.css'
+
+import { apiRequest } from '@/shared/api/client'
 import { createComplaint } from '@/features/complaints/api/complaints'
 
 const categories = [
@@ -108,13 +110,22 @@ export function ComplaintPage() {
     }
 
     try {
+      await apiRequest('/complaints', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      })
       await createComplaint(payload)
 
       setStatus('success')
       setMessage('민원이 등록됐어요. AI가 분류, 요약, 유사 민원을 분석합니다.')
     } catch {
       setStatus('error')
-      setMessage('민원 등록 서버에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.')
+      setMessage(
+        '민원 등록 요청에 실패했어요. 잠시 후 다시 시도해 주세요.',
+      )
     }
   }
 

@@ -1,10 +1,10 @@
-import { Building2, ChevronLeft, MailCheck, ShieldCheck } from 'lucide-react'
+import { Building2, ChevronLeft, MailCheck, ShieldCheck, UserCog } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { SignupForm } from '@/features/auth/components/SignupForm'
 
-export function SignupPage() {
+export function AdminSignupPage() {
   const navigate = useNavigate()
 
   return (
@@ -16,25 +16,25 @@ export function SignupPage() {
           <span className="grid size-10 place-items-center rounded-xl bg-white text-teal-800 shadow-lg shadow-teal-950/30">
             <Building2 className="size-5" aria-hidden="true" />
           </span>
-          캠퍼스 민원 플랫폼
+          캠퍼스 민원 플랫폼 관리자
         </div>
 
         <div className="relative my-auto max-w-md pb-16">
           <div className="grid size-14 place-items-center rounded-2xl bg-white/10 ring-1 ring-white/10">
-            <MailCheck className="size-7 text-teal-200" aria-hidden="true" />
+            <UserCog className="size-7 text-teal-200" aria-hidden="true" />
           </div>
-          <p className="mt-8 text-sm font-bold tracking-[0.2em] text-teal-200">CREATE YOUR ACCOUNT</p>
+          <p className="mt-8 text-sm font-bold tracking-[0.2em] text-teal-200">ADMIN VERIFY</p>
           <h1 className="mt-4 text-5xl leading-[1.12] font-bold tracking-[-0.055em] text-balance">
-            간단한 정보 입력으로,
+            관리자 권한으로,
             <br />
-            바로 시작하세요
+            민원 처리를 시작하세요
           </h1>
           <p className="mt-7 text-lg leading-8 text-teal-100/80">
-            이메일과 닉네임, 비밀번호만 입력하면 캠퍼스 민원 서비스를 이용할 수 있습니다.
+            승인된 담당자만 관리자 계정을 만들 수 있도록 학교 이메일 인증을 거칩니다.
           </p>
           <div className="mt-10 flex items-center gap-3 text-sm text-teal-100/85">
             <ShieldCheck className="size-5 text-teal-200" aria-hidden="true" />
-            회원 정보는 안전하게 처리됩니다.
+            관리자 가입 정보는 권한 검토에 사용됩니다.
           </div>
         </div>
       </section>
@@ -47,13 +47,13 @@ export function SignupPage() {
               <span className="grid size-10 place-items-center rounded-xl bg-teal-700 text-white">
                 <Building2 className="size-5" aria-hidden="true" />
               </span>
-              캠퍼스 민원 플랫폼
+              캠퍼스 민원 플랫폼 관리자
             </span>
           </div>
 
-          <Link className="mb-5 inline-flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-teal-700" to="/login">
+          <Link className="mb-5 inline-flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-teal-700" to="/admin/login">
             <ChevronLeft className="size-4" aria-hidden="true" />
-            로그인으로 돌아가기
+            관리자 로그인으로 돌아가기
           </Link>
 
           <Card>
@@ -62,19 +62,19 @@ export function SignupPage() {
                 <MailCheck className="size-5" aria-hidden="true" />
               </div>
               <span className="mt-5 inline-flex rounded-full bg-teal-50 px-3 py-1 text-xs font-bold text-teal-700 ring-1 ring-teal-100">
-                회원용 회원가입
+                관리자용 회원가입
               </span>
-              <h2 className="mt-6 text-2xl font-bold tracking-tight text-slate-900">학교 이메일로 회원가입</h2>
+              <h2 className="mt-6 text-2xl font-bold tracking-tight text-slate-900">관리자 계정 회원가입</h2>
               <p className="mt-2 text-sm leading-6 text-slate-500">
-                회원용 이메일 인증을 완료한 뒤 필요한 정보만 입력해 가입할 수 있어요.
+                관리자용 학교 이메일 인증을 완료한 뒤 운영 계정을 신청하세요.
               </p>
 
-              <SignupForm onSuccess={() => navigate('/login?registered=1', { replace: true })} />
+              <SignupForm onSuccess={() => navigate('/admin/login?registered=1', { replace: true })} />
 
               <p className="mt-6 text-center text-sm text-slate-500">
-                관리자 계정이 필요한가요?{' '}
-                <Link className="font-semibold text-teal-700 hover:text-teal-800 hover:underline" to="/admin/signup">
-                  관리자용 회원가입
+                일반 회원으로 가입하나요?{' '}
+                <Link className="font-semibold text-teal-700 hover:text-teal-800 hover:underline" to="/signup">
+                  회원용 회원가입
                 </Link>
               </p>
             </CardContent>

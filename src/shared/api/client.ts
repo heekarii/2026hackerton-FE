@@ -1,12 +1,7 @@
-export class ApiError extends Error {
-  readonly status: number
+import { ApiError } from './api-error'
+import { mockApiRequest, shouldUseMockApi } from './mock-api'
 
-  constructor(message: string, status: number) {
-    super(message)
-    this.name = 'ApiError'
-    this.status = status
-  }
-}
+export { ApiError } from './api-error'
 
 type ErrorPayload = {
   detail?: string | Array<{ msg?: string }>
@@ -39,6 +34,10 @@ function getRequestUrl(path: string) {
 }
 
 export async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
+  if (shouldUseMockApi()) {
+    return mockApiRequest<T>(path, options)
+  }
+
   let response: Response
 
   try {
