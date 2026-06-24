@@ -1,32 +1,20 @@
-# React + TypeScript + Vite
+# Campus Voice Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+캠퍼스 민원 분석 플랫폼의 프론트엔드입니다.
 
-Currently, two official plugins are available:
+## 시작하기
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+pnpm install
+cp .env.example .env.local
+pnpm dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+`.env.local`에 FastAPI 서버 주소를 입력합니다.
+
+```bash
+VITE_API_BASE_URL=http://localhost:8000
+VITE_LOGIN_ENDPOINT=/auth/login
+```
+
+로그인 API는 `POST /auth/login`을 기본값으로 사용합니다. FastAPI Swagger의 실제 인증 경로가 다르면 `VITE_LOGIN_ENDPOINT`만 수정하면 됩니다.
