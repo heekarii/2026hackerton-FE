@@ -2,9 +2,6 @@ import { apiRequest } from '@/shared/api/client'
 
 export type SendVerificationCodeResponse = {
   message?: string
-}
-
-export type VerifyEmailCodeResponse = {
   verification_token?: string
   verified?: boolean
 }
@@ -21,14 +18,6 @@ export async function sendVerificationCode(email: string) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email }),
-  })
-}
-
-export async function verifyEmailCode(email: string, code: string) {
-  return apiRequest<VerifyEmailCodeResponse>('/auth/email-verification/verify', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, code }),
   })
 }
 
