@@ -389,6 +389,30 @@ function getUrgencyLabel(urgency: string) {
   return labels[urgency] ?? urgency
 }
 
+function getComplaintStatusLabel(status: ComplaintRecord['status']) {
+  const labels: Record<string, string> = {
+    received: '접수',
+    in_progress: '처리 중',
+    resolved: '처리 완료',
+    rejected: '반려',
+  }
+
+  return labels[status] ?? status
+}
+
+function getComplaintDateLabel(complaint: ComplaintRecord) {
+  const date = getComplaintDate(complaint)
+
+  if (Number.isNaN(date.getTime())) return '접수 시각 미등록'
+
+  return new Intl.DateTimeFormat('ko-KR', {
+    month: 'numeric',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date)
+}
+
 function findDepartment(name: string) {
   return (
     departments.find((department) => department.name === name) ?? {
@@ -551,6 +575,13 @@ function HomePage() {
   )
   const totalComplaints = categoryMetrics.reduce((sum, category) => sum + category.count, 0)
   const urgentTotal = categoryMetrics.reduce((sum, category) => sum + category.urgent, 0)
+  const selectedComplaints = useMemo(
+    () =>
+      complaints
+        .filter((complaint) => normalizeCategory(complaint.ai_category) === selectedCategory)
+        .sort((left, right) => getComplaintDate(right).getTime() - getComplaintDate(left).getTime()),
+    [complaints, selectedCategory],
+  )
   const selectedSimilarCases = useMemo(
     () =>
       similarCases
@@ -903,6 +934,54 @@ function HomePage() {
             <Workflow aria-hidden="true" />
             담당 부서 워크플로우 생성
           </Button>
+
+          <div className="mt-5 border-t border-white/10 pt-5">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-bold text-white">실제 접수 민원</p>
+                <p className="mt-1 text-xs text-slate-300">
+                  {analyticsStatus === 'live'
+                    ? `${selectedComplaints.length}건의 원문 내용`
+                    : '민원 API 연결 후 원문이 표시됩니다.'}
+                </p>
+              </div>
+              <span className="rounded-md bg-white/10 px-2.5 py-1 text-xs font-black text-teal-100">
+                {selectedComplaints.length}건
+              </span>
+            </div>
+
+            {analyticsStatus === 'live' && selectedComplaints.length ? (
+              <ul className="mt-3 grid max-h-[420px] gap-2 overflow-y-auto pr-1">
+                {selectedComplaints.map((complaint) => (
+                  <li key={complaint.id} className="rounded-lg bg-white/8 p-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="min-w-0 text-sm font-black text-white">{complaint.title}</p>
+                      <span className={cn('shrink-0 rounded-md px-2 py-1 text-[11px] font-bold', getUrgencyClass(complaint.ai_urgency ?? 'LOW'))}>
+                        {getUrgencyLabel(complaint.ai_urgency ?? 'LOW')}
+                      </span>
+                    </div>
+                    <p className="mt-2 whitespace-pre-wrap break-words text-xs leading-5 text-slate-200">{complaint.content}</p>
+                    <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-semibold text-slate-300">
+                      <span>{getComplaintStatusLabel(complaint.status)}</span>
+                      {complaint.location ? <span>{complaint.location}</span> : null}
+                      <span>{getComplaintDateLabel(complaint)}</span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="mt-3 rounded-lg border border-dashed border-white/20 bg-white/5 px-3 py-5 text-center">
+                <p className="text-sm font-bold text-slate-200">
+                  {analyticsStatus === 'live' ? `${selected.name} 카테고리의 민원이 없습니다.` : '실제 민원 내용을 불러오는 중입니다.'}
+                </p>
+                <p className="mt-1 text-xs leading-5 text-slate-400">
+                  {analyticsStatus === 'live'
+                    ? '다른 카테고리를 선택하거나 AI 분류를 실행해 보세요.'
+                    : '새로고침 후에도 표시되지 않으면 민원 조회 API를 확인해 주세요.'}
+                </p>
+              </div>
+            )}
+          </div>
         </section>
       </div>
 
