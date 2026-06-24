@@ -1,5 +1,4 @@
 import {
-  Building2,
   CheckCircle2,
   Clock3,
   FileText,
@@ -8,10 +7,11 @@ import {
   Star,
   UserRound,
 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
+import { SejongUniversityLogo } from '@/components/SejongUniversityLogo'
 import { clearAccessToken } from '@/features/auth/auth-storage'
 import { cn } from '@/lib/utils'
 
@@ -91,13 +91,6 @@ const initialComplaints: Complaint[] = [
   },
 ]
 
-const user = {
-  name: '김민서',
-  email: 'minseo@university.ac.kr',
-  department: '컴퓨터공학과',
-  studentId: '20261234',
-}
-
 function getStatusIndex(status: ComplaintStatus) {
   return statusSteps.findIndex((step) => step.key === status)
 }
@@ -105,6 +98,28 @@ function getStatusIndex(status: ComplaintStatus) {
 export function ComplainantPage() {
   const navigate = useNavigate()
   const [complaints, setComplaints] = useState(initialComplaints)
+  const [user, setUser] = useState<AuthUser | null>(() => getAuthUser())
+
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        const response = await apiRequest<{ user: AuthUser }>('/me')
+        if (response.user) {
+          saveAuthUser(response.user)
+          setUser(response.user)
+        }
+      } catch {
+        // 로그인 응답으로 저장한 정보를 우선 보여주고, 새로고침 시에도 화면을 유지합니다.
+      }
+    }
+
+    void loadUser()
+  }, [])
+
+  const displayName = user?.name ?? user?.nickname ?? '이름 미등록'
+  const displayDepartment = user?.department ?? '학과 미등록'
+  const displayStudentId = user?.student_id ?? '학번 미등록'
+  const displayEmail = user?.email ?? '이메일 미등록'
 
   const completedCount = useMemo(
     () => complaints.filter((complaint) => complaint.status === 'completed').length,
@@ -130,11 +145,9 @@ export function ComplainantPage() {
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-5 px-5 py-5 sm:px-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-3">
-            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-teal-700 text-white shadow-lg shadow-teal-700/20">
-              <Building2 className="size-5" aria-hidden="true" />
-            </span>
+            <SejongUniversityLogo className="h-11 max-w-64" />
             <div>
-              <p className="text-sm font-bold text-teal-700">캠퍼스 민원 플랫폼</p>
+              <p className="text-sm font-bold text-red-700">SEJONG CAMPUS VOICE</p>
               <h1 className="text-xl font-bold tracking-tight text-slate-950">민원인 마이페이지</h1>
             </div>
           </div>
@@ -149,23 +162,23 @@ export function ComplainantPage() {
         <aside className="space-y-4">
           <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
             <div className="flex items-center gap-3">
-              <span className="grid size-12 place-items-center rounded-lg bg-teal-50 text-teal-700">
+              <span className="grid size-12 place-items-center rounded-lg bg-red-50 text-red-700">
                 <UserRound className="size-6" aria-hidden="true" />
               </span>
               <div>
-                <h2 className="font-bold text-slate-950">{user.name}</h2>
-                <p className="text-sm text-slate-500">{user.department}</p>
+                <h2 className="font-bold text-slate-950">{displayName}</h2>
+                <p className="text-sm text-slate-500">{displayDepartment}</p>
               </div>
             </div>
 
             <dl className="mt-5 space-y-3 text-sm">
               <div className="flex items-center justify-between gap-4">
                 <dt className="text-slate-500">학번</dt>
-                <dd className="font-medium text-slate-800">{user.studentId}</dd>
+                <dd className="font-medium text-slate-800">{displayStudentId}</dd>
               </div>
               <div className="flex items-center justify-between gap-4">
                 <dt className="text-slate-500">이메일</dt>
-                <dd className="min-w-0 truncate text-right font-medium text-slate-800">{user.email}</dd>
+                <dd className="min-w-0 truncate text-right font-medium text-slate-800">{displayEmail}</dd>
               </div>
             </dl>
           </section>
@@ -177,7 +190,7 @@ export function ComplainantPage() {
             </div>
             <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
               <p className="text-sm text-slate-500">진행 중</p>
-              <p className="mt-2 text-3xl font-bold text-teal-700">{activeCount}</p>
+              <p className="mt-2 text-3xl font-bold text-red-700">{activeCount}</p>
             </div>
             <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm max-lg:col-span-2">
               <p className="text-sm text-slate-500">완료된 민원</p>
@@ -212,7 +225,7 @@ export function ComplainantPage() {
                         <span className="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
                           접수번호 {complaint.id}
                         </span>
-                        <span className="rounded-md bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-700">
+                        <span className="rounded-md bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700">
                           {complaint.category}
                         </span>
                       </div>
@@ -238,13 +251,13 @@ export function ComplainantPage() {
                             <div
                               className={cn(
                                 'h-2 rounded-full',
-                                isDone ? 'bg-teal-700' : 'bg-slate-200',
+                                isDone ? 'bg-red-700' : 'bg-slate-200',
                               )}
                             />
                             <p
                               className={cn(
                                 'mt-2 truncate text-xs font-semibold',
-                                isDone ? 'text-teal-700' : 'text-slate-400',
+                                isDone ? 'text-red-700' : 'text-slate-400',
                               )}
                             >
                               {step.label}
@@ -279,7 +292,7 @@ export function ComplainantPage() {
                             <button
                               key={rating}
                               type="button"
-                              className="grid size-9 place-items-center rounded-lg text-amber-400 transition hover:bg-amber-50 focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:outline-none"
+                              className="grid size-9 place-items-center rounded-lg text-amber-400 transition hover:bg-amber-50 focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:outline-none"
                               role="radio"
                               aria-checked={complaint.satisfaction === rating}
                               aria-label={`${rating}점`}

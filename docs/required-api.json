@@ -68,7 +68,10 @@
         "contentType": "application/json",
         "body": {
           "email": "minseo@university.ac.kr",
+          "name": "김민서",
           "nickname": "민서",
+          "student_id": "20261234",
+          "department": "컴퓨터공학과",
           "password": "password1234",
           "verification_token": "email-verification-token"
         }
@@ -78,7 +81,10 @@
         "body": {
           "id": 2,
           "email": "minseo@university.ac.kr",
+          "name": "김민서",
           "nickname": "민서",
+          "student_id": "20261234",
+          "department": "컴퓨터공학과",
           "message": "회원가입이 완료되었습니다."
         }
       },

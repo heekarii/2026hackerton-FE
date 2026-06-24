@@ -1,5 +1,6 @@
 import { ApiError } from './api-error'
 import { mockApiRequest, shouldUseMockApi } from './mock-api'
+import { getAccessToken } from '@/features/auth/auth-storage'
 
 export { ApiError } from './api-error'
 
@@ -74,4 +75,3 @@ export async function apiRequest<T>(path: string, options: RequestInit = {}): Pr
 
   return payload as T
 }
-import { getAccessToken } from '@/features/auth/auth-storage'

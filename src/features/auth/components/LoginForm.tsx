@@ -127,7 +127,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           />
           <button
             type="button"
-            className="absolute top-1/2 right-3 grid size-7 -translate-y-1/2 place-items-center rounded-md text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 focus-visible:ring-2 focus-visible:ring-teal-600 focus-visible:outline-none"
+            className="absolute top-1/2 right-3 grid size-7 -translate-y-1/2 place-items-center rounded-md text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:outline-none"
             aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 표시'}
             onClick={() => setShowPassword((current) => !current)}
           >

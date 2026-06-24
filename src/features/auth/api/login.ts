@@ -1,4 +1,4 @@
-import { saveAccessToken } from '@/features/auth/auth-storage'
+import { type AuthUser, saveAccessToken, saveAuthUser } from '@/features/auth/auth-storage'
 import { apiRequest } from '@/shared/api/client'
 
 export type LoginPayload = {
@@ -12,9 +12,7 @@ export type LoginResponse = {
   role?: string
   user_role?: string
   member_role?: string
-  user?: {
-    role?: string
-  }
+  user?: AuthUser
 }
 
 export function getLoginRedirectPath(response: LoginResponse) {
@@ -34,6 +32,7 @@ export async function login(payload: LoginPayload) {
 
   // JSON 토큰 응답은 세션 동안만 보관합니다. HttpOnly 쿠키 방식도 credentials로 지원합니다.
   if (response.access_token) saveAccessToken(response.access_token)
+  if (response.user) saveAuthUser(response.user)
 
   return response
 }
