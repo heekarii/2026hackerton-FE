@@ -2,6 +2,7 @@ import { ArrowUpRight, Building2, ChartNoAxesCombined, CheckCircle2, KeyRound, S
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 
 import { Card, CardContent } from '@/components/ui/card'
+import { getLoginRedirectPath } from '@/features/auth/api/login'
 import { LoginForm } from '@/features/auth/components/LoginForm'
 
 const adminHighlights = [
@@ -85,7 +86,7 @@ export function AdminLoginPage() {
                 </div>
               ) : null}
 
-              <LoginForm onSuccess={() => navigate('/', { replace: true })} />
+              <LoginForm onSuccess={(response) => navigate(getLoginRedirectPath(response), { replace: true })} />
 
               <p className="mt-6 text-center text-sm text-slate-500">
                 관리자 계정이 없나요?{' '}

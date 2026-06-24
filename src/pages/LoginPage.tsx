@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { LoginForm } from '@/features/auth/components/LoginForm'
+import { getLoginRedirectPath } from '@/features/auth/api/login'
 
 const highlights = [
   { icon: MapPinned, label: '지도 기반 민원 접수' },
@@ -86,7 +87,7 @@ export function LoginPage() {
                 </div>
               ) : null}
 
-              <LoginForm onSuccess={() => navigate('/', { replace: true })} />
+              <LoginForm onSuccess={(response) => navigate(getLoginRedirectPath(response), { replace: true })} />
 
               <p className="mt-6 text-center text-sm text-slate-500">
                 아직 계정이 없나요?{' '}
