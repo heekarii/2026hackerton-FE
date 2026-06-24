@@ -98,23 +98,23 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
         </div>
       )}
 
-      <section className="space-y-3">
-        <Label htmlFor="signup-email">이메일</Label>
-        <div className="relative">
-          <Mail className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
-          <Input
-            id="signup-email"
-            type="email"
-            autoComplete="email"
-            placeholder="이메일을 입력하세요"
-            value={email}
-            className="pl-10"
-            onChange={(event) => setEmail(event.target.value)}
-          />
+      <fieldset className="space-y-5" disabled={isSubmitting}>
+        <div className="space-y-2">
+          <Label htmlFor="signup-email">학교 이메일</Label>
+          <div className="relative">
+            <Mail className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+            <Input
+              id="signup-email"
+              type="email"
+              autoComplete="email"
+              placeholder="name@university.ac.kr"
+              value={email}
+              className="pl-10"
+              onChange={(event) => setEmail(event.target.value)}
+            />
+          </div>
         </div>
-      </section>
 
-      <fieldset className="space-y-5">
         <div className="space-y-2">
           <Label htmlFor="name">이름</Label>
           <Input
@@ -176,7 +176,7 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
         <label className="flex cursor-pointer items-start gap-2.5 text-sm leading-5 text-slate-600">
           <input
             type="checkbox"
-            className="mt-0.5 size-4 rounded border-slate-300 accent-teal-700"
+            className="mt-0.5 size-4 rounded border-slate-300 accent-red-700"
             checked={agreedToTerms}
             onChange={(event) => setAgreedToTerms(event.target.checked)}
           />
