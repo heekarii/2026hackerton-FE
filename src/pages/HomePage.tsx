@@ -49,6 +49,7 @@ import { cn } from '@/lib/utils'
 type CategoryName = '시설' | '수업' | '학식' | '도서관' | '행정' | '안전/보건' | '기타'
 type AdminView = 'overview' | 'analysis' | 'departments' | 'ai' | 'reports'
 type WorkflowStatus = '대기' | '진행 중' | '완료'
+type SemesterFilter = '전체 기간' | '2026-1학기' | '2026-2학기'
 
 type ComplaintCategory = {
   name: CategoryName
@@ -442,6 +443,20 @@ function getComplaintDate(complaint: ComplaintRecord) {
   return Number.isNaN(date.getTime()) ? new Date(complaint.created_at) : date
 }
 
+function isInSemester(complaint: ComplaintRecord, semester: SemesterFilter) {
+  if (semester === '전체 기간') return true
+
+  const date = getComplaintDate(complaint)
+  if (Number.isNaN(date.getTime())) return false
+
+  const year = date.getFullYear()
+  const month = date.getMonth()
+
+  return semester === '2026-1학기'
+    ? year === 2026 && month >= 2 && month <= 7
+    : (year === 2026 && month >= 8) || (year === 2027 && month <= 1)
+}
+
 function parseExpectedDays(value: string | null) {
   if (!value) return null
   if (value.includes('즉시')) return 0.5
@@ -542,6 +557,8 @@ function buildTrendingComplaints(records: ComplaintRecord[]) {
 function HomePage() {
   const navigate = useNavigate()
   const [activeView, setActiveView] = useState<AdminView>('overview')
+  const [semesterFilter, setSemesterFilter] = useState<SemesterFilter>('2026-1학기')
+  const [campusFilter, setCampusFilter] = useState('전체 캠퍼스')
   const [selectedCategory, setSelectedCategory] = useState<CategoryName>('시설')
   const [analysisCategory, setAnalysisCategory] = useState<'전체' | CategoryName>('전체')
   const [selectedHotspot, setSelectedHotspot] = useState(locationHotspots[0])
@@ -569,18 +586,53 @@ function HomePage() {
   const [reportPeriod, setReportPeriod] = useState<'2026-1학기' | '연말'>('2026-1학기')
   const [reportGenerated, setReportGenerated] = useState(false)
 
-  const selected = useMemo(
-    () => categoryMetrics.find((category) => category.name === selectedCategory) ?? categoryMetrics[0],
-    [categoryMetrics, selectedCategory],
+  const campusOptions = useMemo(
+    () => ['전체 캠퍼스', ...new Set(complaints.map((complaint) => complaint.location?.trim()).filter(Boolean))],
+    [complaints],
   )
-  const totalComplaints = categoryMetrics.reduce((sum, category) => sum + category.count, 0)
-  const urgentTotal = categoryMetrics.reduce((sum, category) => sum + category.urgent, 0)
+  const filteredComplaints = useMemo(
+    () =>
+      complaints.filter(
+        (complaint) =>
+          isInSemester(complaint, semesterFilter) &&
+          (campusFilter === '전체 캠퍼스' || complaint.location?.trim() === campusFilter),
+      ),
+    [campusFilter, complaints, semesterFilter],
+  )
+  const filteredCategoryMetrics = useMemo(
+    () => (analyticsStatus === 'live' ? buildCategoryMetrics(filteredComplaints) : categoryMetrics),
+    [analyticsStatus, categoryMetrics, filteredComplaints],
+  )
+  const filteredTimeMetrics = useMemo(
+    () => (analyticsStatus === 'live' ? buildTimeMetrics(filteredComplaints) : timeMetrics),
+    [analyticsStatus, filteredComplaints, timeMetrics],
+  )
+  const filteredDensityMetrics = useMemo(
+    () => (analyticsStatus === 'live' ? buildWeeklyDensity(filteredComplaints) : densityMetrics),
+    [analyticsStatus, densityMetrics, filteredComplaints],
+  )
+  const filteredHotspotMetrics = useMemo(
+    () => (analyticsStatus === 'live' ? buildHotspotMetrics(filteredComplaints) : hotspotMetrics),
+    [analyticsStatus, filteredComplaints, hotspotMetrics],
+  )
+  const filteredTrendingMetrics = useMemo(() => {
+    if (analyticsStatus !== 'live') return trendingMetrics
+    const nextTrending = buildTrendingComplaints(filteredComplaints)
+    return nextTrending.length ? nextTrending : []
+  }, [analyticsStatus, filteredComplaints, trendingMetrics])
+
+  const selected = useMemo(
+    () => filteredCategoryMetrics.find((category) => category.name === selectedCategory) ?? filteredCategoryMetrics[0],
+    [filteredCategoryMetrics, selectedCategory],
+  )
+  const totalComplaints = filteredCategoryMetrics.reduce((sum, category) => sum + category.count, 0)
+  const urgentTotal = filteredCategoryMetrics.reduce((sum, category) => sum + category.urgent, 0)
   const selectedComplaints = useMemo(
     () =>
-      complaints
+      filteredComplaints
         .filter((complaint) => normalizeCategory(complaint.ai_category) === selectedCategory)
         .sort((left, right) => getComplaintDate(right).getTime() - getComplaintDate(left).getTime()),
-    [complaints, selectedCategory],
+    [filteredComplaints, selectedCategory],
   )
   const selectedSimilarCases = useMemo(
     () =>
@@ -593,16 +645,16 @@ function HomePage() {
   const visibleHotspots = useMemo(
     () =>
       analysisCategory === '전체'
-        ? hotspotMetrics
-        : hotspotMetrics.filter((spot) => spot.category === analysisCategory),
-    [analysisCategory, hotspotMetrics],
+        ? filteredHotspotMetrics
+        : filteredHotspotMetrics.filter((spot) => spot.category === analysisCategory),
+    [analysisCategory, filteredHotspotMetrics],
   )
   const selectedDepartment = findDepartment(selectedDepartmentName)
   const aiCategory = analysisResult?.category ?? selectedCategory
   const aiEstimate = estimateByCategory[aiCategory] ?? estimateByCategory.행정
   const analysisNeedsNotification =
     analysisResult?.sensitive || analysisResult?.urgency === 'HIGH' || analysisResult?.urgency === 'CRITICAL'
-  const unclassifiedComplaints = complaints.filter((complaint) => !complaint.ai_category)
+  const unclassifiedComplaints = filteredComplaints.filter((complaint) => !complaint.ai_category)
 
   function applyComplaintMetrics(records: ComplaintRecord[]) {
     const nextCategoryMetrics = buildCategoryMetrics(records)
@@ -804,7 +856,7 @@ function HomePage() {
       ['긴급 민원', String(urgentTotal)],
       [],
       ['카테고리', '접수 건수', '비중', '평균 처리일', '긴급 건수'],
-      ...categoryMetrics.map((category) => [
+      ...filteredCategoryMetrics.map((category) => [
         category.name,
         String(category.count),
         `${category.share}%`,
@@ -843,7 +895,7 @@ function HomePage() {
           <div className={cn('mt-4 flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between', analyticsStatus === 'live' ? 'border-teal-200 bg-teal-50' : analyticsStatus === 'loading' ? 'border-slate-200 bg-slate-50' : 'border-amber-200 bg-amber-50')}>
             <div>
               <p className={cn('text-sm font-bold', analyticsStatus === 'live' ? 'text-teal-800' : 'text-slate-700')}>
-                {analyticsStatus === 'live' ? `실제 민원 ${complaints.length}건을 AI 분류 기준으로 집계 중` : analyticsStatus === 'loading' ? '실제 민원 데이터를 불러오는 중' : '데모 집계 표시 중'}
+                {analyticsStatus === 'live' ? `선택 조건의 실제 민원 ${filteredComplaints.length}건을 AI 분류 기준으로 집계 중` : analyticsStatus === 'loading' ? '실제 민원 데이터를 불러오는 중' : '데모 집계 표시 중'}
               </p>
               <p className="mt-1 text-xs text-slate-600">{analyticsError || `미분류 민원 ${unclassifiedComplaints.length}건은 AI 분류 후 통계에 반영할 수 있습니다.`}</p>
             </div>
@@ -855,7 +907,7 @@ function HomePage() {
           {reclassificationMessage ? <p className="mt-3 text-sm font-semibold text-teal-700">{reclassificationMessage}</p> : null}
 
           <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {categoryMetrics.map((category) => {
+            {filteredCategoryMetrics.map((category) => {
               const isSelected = category.name === selectedCategory
 
               return (
@@ -1033,7 +1085,7 @@ function HomePage() {
               <Megaphone className="size-5 text-slate-400" aria-hidden="true" />
             </div>
             <ul className="mt-4 grid gap-3">
-              {trendingMetrics.map((item, index) => (
+              {filteredTrendingMetrics.map((item, index) => (
                 <li key={item.title} className="flex items-start gap-3">
                   <span className="grid size-7 shrink-0 place-items-center rounded-md bg-slate-100 text-xs font-black text-slate-600">{index + 1}</span>
                   <div className="min-w-0 flex-1">
@@ -1126,7 +1178,7 @@ function HomePage() {
               onChange={(event) => setAnalysisCategory(event.target.value as '전체' | CategoryName)}
             >
               <option value="전체">전체 카테고리</option>
-              {categoryMetrics.map((category) => <option key={category.name} value={category.name}>{category.name}</option>)}
+              {filteredCategoryMetrics.map((category) => <option key={category.name} value={category.name}>{category.name}</option>)}
             </select>
           </label>
         </div>
@@ -1143,12 +1195,12 @@ function HomePage() {
             <div className="mt-5 overflow-x-auto">
               <div className="grid min-w-[620px] grid-cols-[48px_repeat(7,minmax(0,1fr))] gap-2">
                 <span />
-                {timeMetrics.map((slot) => <p key={slot.label} className="text-center text-xs font-bold text-slate-500">{slot.label}</p>)}
-                {densityMetrics.map((row, rowIndex) => (
+                {filteredTimeMetrics.map((slot) => <p key={slot.label} className="text-center text-xs font-bold text-slate-500">{slot.label}</p>)}
+                {filteredDensityMetrics.map((row, rowIndex) => (
                   <div key={dayLabels[rowIndex]} className="contents">
                     <p className="grid place-items-center text-xs font-bold text-slate-500">{dayLabels[rowIndex]}</p>
                     {row.map((value, valueIndex) => (
-                      <div key={`${dayLabels[rowIndex]}-${timeMetrics[valueIndex].label}`} className={cn('grid aspect-square place-items-center rounded-md text-xs font-black', getHeatColor(value))}>{value}</div>
+                      <div key={`${dayLabels[rowIndex]}-${filteredTimeMetrics[valueIndex].label}`} className={cn('grid aspect-square place-items-center rounded-md text-xs font-black', getHeatColor(value))}>{value}</div>
                     ))}
                   </div>
                 ))}
@@ -1292,7 +1344,7 @@ function HomePage() {
       <section className="rounded-lg border border-slate-200 bg-white p-5"><div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"><div><p className="text-sm font-semibold text-teal-700">학기별·연말 통계</p><h2 className="mt-1 text-2xl font-black tracking-tight">민원 통계 리포트</h2><p className="mt-1 text-sm text-slate-500">카테고리, 긴급도, 처리 SLA, 영향도를 한 번에 정리합니다.</p></div><div className="flex items-center gap-2"><div className="inline-flex rounded-lg bg-slate-100 p-1">{(['2026-1학기', '연말'] as const).map((period) => <button key={period} type="button" className={cn('h-8 rounded-md px-3 text-xs font-bold transition', reportPeriod === period ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500')} onClick={() => setReportPeriod(period)}>{period}</button>)}</div><Button variant="outline" size="sm" onClick={downloadReport}><Download aria-hidden="true" />CSV</Button></div></div>
         <div className="mt-6 grid gap-3 md:grid-cols-3">{[["접수 민원", `${totalComplaints}건`, '전학기 대비 +14%'], ['긴급 처리 SLA', '4.1일', '목표 5일 이내'], ['예상 영향 인원', '8,420명', '상위 3개 이슈 기준']].map(([label, value, note]) => <div key={label} className="rounded-lg border border-slate-200 p-4"><p className="text-sm font-semibold text-slate-500">{label}</p><p className="mt-3 text-3xl font-black text-slate-950">{value}</p><p className="mt-1 text-xs font-bold text-teal-700">{note}</p></div>)}</div>
       </section>
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]"><section className="min-w-0 rounded-lg border border-slate-200 bg-white p-5"><div className="flex items-center justify-between gap-3"><div><p className="text-sm font-semibold text-slate-500">카테고리별 SLA</p><h2 className="mt-1 text-lg font-black">처리 기간과 긴급도 비교</h2></div><LineChart className="size-5 text-slate-400" aria-hidden="true" /></div><div className="mt-5 overflow-x-auto rounded-lg border border-slate-200"><table className="w-full min-w-[620px] text-left text-sm"><thead className="bg-slate-50 text-xs font-bold tracking-wide text-slate-500 uppercase"><tr><th className="px-4 py-3">카테고리</th><th className="px-4 py-3">접수</th><th className="px-4 py-3">평균 처리</th><th className="px-4 py-3">긴급</th><th className="px-4 py-3">변화</th></tr></thead><tbody className="divide-y divide-slate-100">{categoryMetrics.map((category) => <tr key={category.name}><td className="px-4 py-3 font-bold text-slate-900">{category.name}</td><td className="px-4 py-3">{category.count}건</td><td className="px-4 py-3">{category.averageDays}일</td><td className="px-4 py-3"><span className="rounded-md bg-rose-50 px-2 py-1 text-xs font-bold text-rose-700">{category.urgent}건</span></td><td className={cn('px-4 py-3 font-bold', category.delta > 0 ? 'text-rose-600' : 'text-teal-700')}>{category.delta > 0 ? '+' : ''}{category.delta}%</td></tr>)}</tbody></table></div></section>
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]"><section className="min-w-0 rounded-lg border border-slate-200 bg-white p-5"><div className="flex items-center justify-between gap-3"><div><p className="text-sm font-semibold text-slate-500">카테고리별 SLA</p><h2 className="mt-1 text-lg font-black">처리 기간과 긴급도 비교</h2></div><LineChart className="size-5 text-slate-400" aria-hidden="true" /></div><div className="mt-5 overflow-x-auto rounded-lg border border-slate-200"><table className="w-full min-w-[620px] text-left text-sm"><thead className="bg-slate-50 text-xs font-bold tracking-wide text-slate-500 uppercase"><tr><th className="px-4 py-3">카테고리</th><th className="px-4 py-3">접수</th><th className="px-4 py-3">평균 처리</th><th className="px-4 py-3">긴급</th><th className="px-4 py-3">변화</th></tr></thead><tbody className="divide-y divide-slate-100">{filteredCategoryMetrics.map((category) => <tr key={category.name}><td className="px-4 py-3 font-bold text-slate-900">{category.name}</td><td className="px-4 py-3">{category.count}건</td><td className="px-4 py-3">{category.averageDays}일</td><td className="px-4 py-3"><span className="rounded-md bg-rose-50 px-2 py-1 text-xs font-bold text-rose-700">{category.urgent}건</span></td><td className={cn('px-4 py-3 font-bold', category.delta > 0 ? 'text-rose-600' : 'text-teal-700')}>{category.delta > 0 ? '+' : ''}{category.delta}%</td></tr>)}</tbody></table></div></section>
         <aside className="rounded-lg border border-slate-200 bg-white p-5"><div className="flex items-center gap-2"><FileBarChart className="size-5 text-teal-700" aria-hidden="true" /><div><p className="text-sm font-semibold text-slate-500">리포트 생성</p><h2 className="mt-1 text-lg font-black">관리자 검토본</h2></div></div><p className="mt-4 text-sm leading-6 text-slate-600">선택한 기간의 집계와 AI 분석 추정치를 기반으로 리포트 초안을 생성합니다.</p><Button className="mt-5 w-full" onClick={() => setReportGenerated(true)}><FileBarChart aria-hidden="true" />{reportGenerated ? '리포트 초안 갱신' : '리포트 초안 생성'}</Button>{reportGenerated ? <div className="mt-4 rounded-md bg-teal-50 p-3 text-sm font-bold text-teal-800"><CheckCircle2 className="mr-2 inline size-4" aria-hidden="true" />{reportPeriod} 운영 리포트 초안이 준비되었습니다.</div> : null}</aside></div>
     </div>
   )
@@ -1313,7 +1365,33 @@ function HomePage() {
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-5 py-4 lg:flex-row lg:items-center lg:justify-between lg:px-8">
           <div className="flex items-center gap-3"><span className="grid size-10 shrink-0 place-items-center rounded-lg bg-teal-700 text-white"><Building2 className="size-5" aria-hidden="true" /></span><div><p className="text-xs font-bold tracking-[0.16em] text-slate-500 uppercase">Campus Voice Admin</p><h1 className="text-xl font-bold tracking-tight text-slate-950 sm:text-2xl">학교 민원 통합 관제</h1></div></div>
-          <div className="flex flex-wrap items-center gap-2"><Button variant="outline" size="sm"><CalendarDays aria-hidden="true" />2026-1학기</Button><Button variant="outline" size="sm"><Filter aria-hidden="true" />전체 캠퍼스</Button><Button variant="ghost" size="sm" onClick={handleLogout}><LogOut aria-hidden="true" />로그아웃</Button></div>
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="relative inline-flex h-9 items-center rounded-md border border-slate-200 bg-white pl-3 text-slate-700 shadow-sm transition hover:border-slate-300 focus-within:border-teal-600 focus-within:ring-2 focus-within:ring-teal-100">
+              <CalendarDays className="pointer-events-none size-4 shrink-0" aria-hidden="true" />
+              <span className="sr-only">집계 학기</span>
+              <select
+                className="h-full cursor-pointer appearance-none bg-transparent py-0 pr-8 pl-2 text-sm font-bold outline-none"
+                value={semesterFilter}
+                onChange={(event) => setSemesterFilter(event.target.value as SemesterFilter)}
+              >
+                <option value="2026-1학기">2026-1학기</option>
+                <option value="2026-2학기">2026-2학기</option>
+                <option value="전체 기간">전체 기간</option>
+              </select>
+            </label>
+            <label className="relative inline-flex h-9 items-center rounded-md border border-slate-200 bg-white pl-3 text-slate-700 shadow-sm transition hover:border-slate-300 focus-within:border-teal-600 focus-within:ring-2 focus-within:ring-teal-100">
+              <Filter className="pointer-events-none size-4 shrink-0" aria-hidden="true" />
+              <span className="sr-only">집계 캠퍼스 또는 위치</span>
+              <select
+                className="h-full max-w-44 cursor-pointer appearance-none bg-transparent py-0 pr-8 pl-2 text-sm font-bold outline-none"
+                value={campusFilter}
+                onChange={(event) => setCampusFilter(event.target.value)}
+              >
+                {campusOptions.map((option) => <option key={option} value={option}>{option}</option>)}
+              </select>
+            </label>
+            <Button variant="ghost" size="sm" onClick={handleLogout}><LogOut aria-hidden="true" />로그아웃</Button>
+          </div>
         </div>
       </header>
       <div className="mx-auto grid min-w-0 w-full max-w-[1440px] gap-5 px-5 py-5 lg:grid-cols-[240px_minmax(0,1fr)] lg:px-8">
