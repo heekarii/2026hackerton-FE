@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import '@/App.css'
 
-const API_BASE_URL = 'https://two026hackerton-be.onrender.com'
+import { apiRequest } from '@/shared/api/client'
 
 const categories = [
   '시설',
@@ -107,7 +107,7 @@ export function ComplaintPage() {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/complaints`, {
+      await apiRequest('/complaints', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -115,16 +115,12 @@ export function ComplaintPage() {
         body: JSON.stringify(payload),
       })
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`)
-      }
-
       setStatus('success')
       setMessage('민원이 등록됐어요. AI가 분류, 요약, 유사 민원을 분석합니다.')
     } catch {
       setStatus('error')
       setMessage(
-        '현재 배포된 API 문서에는 민원 등록 엔드포인트가 없어 전송에 실패했어요. 화면 데이터는 유지됩니다.',
+        '민원 등록 요청에 실패했어요. 잠시 후 다시 시도해 주세요.',
       )
     }
   }
