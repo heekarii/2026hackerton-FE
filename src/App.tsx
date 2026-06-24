@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import type { ReactNode } from 'react'
 
 import { HomePage } from '@/pages/HomePage'
 import { AdminLoginPage } from '@/pages/AdminLoginPage'
@@ -7,6 +8,7 @@ import { LoginPage } from '@/pages/LoginPage'
 import { SignupPage } from '@/pages/SignupPage'
 import { ComplaintPage } from '@/pages/ComplaintPage'
 import { ComplainantPage } from '@/pages/ComplainantPage'
+import { getAccessToken, getAuthUser } from '@/features/auth/auth-storage'
 
 export const categories = [
   '시설',
@@ -54,17 +56,50 @@ export function formatFileSize(size: number) {
   return `${(size / 1024 / 1024).toFixed(1)}MB`
 }
 
+function ProtectedRoute({
+  children,
+  loginPath = '/login',
+  requireAdmin = false,
+}: {
+  children: ReactNode
+  loginPath?: string
+  requireAdmin?: boolean
+}) {
+  const user = getAuthUser()
+  const hasSession = Boolean(getAccessToken() || user)
+  const isAdmin = user?.role?.toUpperCase().includes('ADMIN') ?? false
+
+  if (!hasSession) return <Navigate replace to={loginPath} />
+  if (requireAdmin && !isAdmin) return <Navigate replace to="/mypage" />
+
+  return children
+}
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute loginPath="/admin/login" requireAdmin>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/admin/login" element={<AdminLoginPage />} />
         <Route path="/admin/signup" element={<AdminSignupPage />} />
         <Route path="/complaint" element={<ComplaintPage />} />
-        <Route path="/mypage" element={<ComplainantPage />} />
+        <Route
+          path="/mypage"
+          element={
+            <ProtectedRoute>
+              <ComplainantPage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<Navigate replace to="/login" />} />
       </Routes>
     </BrowserRouter>

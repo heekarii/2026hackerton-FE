@@ -1,8 +1,9 @@
 import { ApiError } from './api-error'
+import type { AuthUser } from '@/features/auth/auth-storage'
 
 type JsonBody = Record<string, unknown>
 
-let mockUser = {
+let mockUser: AuthUser = {
   id: 1,
   name: '김민서',
   nickname: '민서',
@@ -104,6 +105,18 @@ export async function mockApiRequest<T>(path: string, options: RequestInit = {})
   await new Promise((resolve) => window.setTimeout(resolve, 250))
 
   if (method === 'POST' && path === '/auth/login') {
+    const email = typeof body.email === 'string' ? body.email : mockUser.email
+    const isAdmin = email.toLowerCase().includes('admin')
+    mockUser = {
+      ...mockUser,
+      name: isAdmin ? '관리자' : '김민서',
+      nickname: isAdmin ? '관리자' : '민서',
+      email,
+      department: isAdmin ? '학생지원과' : '컴퓨터공학과',
+      student_id: isAdmin ? null : '20261234',
+      role: isAdmin ? 'ADMIN' : 'complainant',
+    }
+
     return {
       access_token: 'mock-access-token',
       token_type: 'bearer',

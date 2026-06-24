@@ -21,6 +21,10 @@ export function getLoginRedirectPath(response: LoginResponse) {
   return role?.toUpperCase().includes('ADMIN') ? '/' : '/mypage'
 }
 
+function getLoginRole(response: LoginResponse) {
+  return response.role ?? response.user_role ?? response.member_role ?? response.user?.role
+}
+
 export async function login(payload: LoginPayload) {
   const response = await apiRequest<LoginResponse>('/auth/login', {
     method: 'POST',
@@ -32,7 +36,12 @@ export async function login(payload: LoginPayload) {
 
   // JSON 토큰 응답은 세션 동안만 보관합니다. HttpOnly 쿠키 방식도 credentials로 지원합니다.
   if (response.access_token) saveAccessToken(response.access_token)
-  if (response.user) saveAuthUser(response.user)
+  const role = getLoginRole(response)
+  if (response.user) {
+    saveAuthUser({ ...response.user, role: role ?? response.user.role })
+  } else if (role) {
+    saveAuthUser({ email: payload.email, role })
+  }
 
   return response
 }

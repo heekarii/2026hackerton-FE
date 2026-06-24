@@ -12,8 +12,14 @@ import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
 import { SejongUniversityLogo } from '@/components/SejongUniversityLogo'
-import { clearAccessToken } from '@/features/auth/auth-storage'
+import {
+  clearAccessToken,
+  getAuthUser,
+  saveAuthUser,
+  type AuthUser,
+} from '@/features/auth/auth-storage'
 import { cn } from '@/lib/utils'
+import { apiRequest } from '@/shared/api/client'
 
 type ComplaintStatus = 'received' | 'processing' | 'completed'
 

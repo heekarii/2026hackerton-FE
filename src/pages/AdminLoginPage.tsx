@@ -3,6 +3,8 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { LoginForm } from '@/features/auth/components/LoginForm'
+import { saveAuthUser } from '@/features/auth/auth-storage'
+import type { LoginResponse } from '@/features/auth/api/login'
 
 const adminHighlights = [
   { icon: ChartNoAxesCombined, label: '민원 통합 관제 대시보드' },
@@ -14,6 +16,15 @@ export function AdminLoginPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const isRegistered = searchParams.get('registered') === '1'
+
+  function handleAdminLoginSuccess(response: LoginResponse) {
+    saveAuthUser({
+      email: response.user?.email ?? 'admin@university.ac.kr',
+      ...response.user,
+      role: 'ADMIN',
+    })
+    navigate('/', { replace: true })
+  }
 
   return (
     <main className="relative grid min-h-svh overflow-hidden bg-slate-50 lg:grid-cols-[1.1fr_0.9fr]">
@@ -85,7 +96,7 @@ export function AdminLoginPage() {
                 </div>
               ) : null}
 
-              <LoginForm onSuccess={() => navigate('/', { replace: true })} />
+              <LoginForm onSuccess={handleAdminLoginSuccess} />
 
               <p className="mt-6 text-center text-sm text-slate-500">
                 관리자 계정이 없나요?{' '}
