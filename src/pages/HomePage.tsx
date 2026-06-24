@@ -1183,7 +1183,7 @@ function HomePage() {
           </label>
         </div>
 
-        <div className="mt-6 grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="mt-6 grid gap-5">
           <section className="min-w-0 rounded-lg border border-slate-200 p-4">
             <div className="flex items-center justify-between gap-3">
               <div>
@@ -1212,7 +1212,12 @@ function HomePage() {
               <div className="rounded-md bg-red-50 p-3"><p className="text-xs font-bold text-red-700">권장 조치</p><p className="mt-1 text-lg font-black text-red-950">순찰 인력 증원</p></div>
             </div>
           </section>
+        </div>
+      </section>
 
+      <section className="rounded-lg border border-slate-200 bg-white p-5">
+        <div className="flex items-center justify-between gap-3"><div><p className="text-sm font-semibold text-slate-500">캠퍼스 맵</p><h2 className="mt-1 text-lg font-black">건물별 민원 핫스팟</h2></div><MapPin className="size-5 text-slate-400" aria-hidden="true" /></div>
+        <div className="mt-5 grid gap-5 lg:grid-cols-[320px_minmax(0,1fr)] xl:grid-cols-[360px_minmax(0,1fr)]">
           <section className="rounded-lg border border-slate-200 bg-slate-950 p-5 text-white">
             <p className="text-sm font-semibold text-red-200">선택 핫스팟</p>
             <h3 className="mt-1 text-2xl font-black">{selectedHotspot.name} <span className="text-slate-400">{selectedHotspot.building}</span></h3>
@@ -1226,8 +1231,6 @@ function HomePage() {
               현장 조치 워크플로우
             </Button>
           </section>
-        </div>
-      </section>
 
       <section className="rounded-lg border border-slate-200 bg-white p-5">
         <div className="flex items-center justify-between gap-3"><div><p className="text-sm font-semibold text-slate-500">캠퍼스 맵</p><h2 className="mt-1 text-lg font-black">건물별 민원 핫스팟</h2></div><MapPin className="size-5 text-slate-400" aria-hidden="true" /></div>

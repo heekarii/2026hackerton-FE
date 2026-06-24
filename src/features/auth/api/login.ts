@@ -9,6 +9,18 @@ export type LoginPayload = {
 export type LoginResponse = {
   access_token?: string
   token_type?: string
+  role?: string
+  user_role?: string
+  member_role?: string
+  user?: {
+    role?: string
+  }
+}
+
+export function getLoginRedirectPath(response: LoginResponse) {
+  const role = response.role ?? response.user_role ?? response.member_role ?? response.user?.role
+
+  return role?.toUpperCase().includes('ADMIN') ? '/' : '/mypage'
 }
 
 export async function login(payload: LoginPayload) {

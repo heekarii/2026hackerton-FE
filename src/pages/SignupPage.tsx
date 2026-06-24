@@ -18,11 +18,11 @@ export function SignupPage() {
           <div className="grid size-14 place-items-center rounded-2xl bg-white/10 ring-1 ring-white/10">
             <MailCheck className="size-7 text-red-200" aria-hidden="true" />
           </div>
-          <p className="mt-8 text-sm font-bold tracking-[0.2em] text-red-200">SCHOOL EMAIL VERIFY</p>
+          <p className="mt-8 text-sm font-bold tracking-[0.2em] text-teal-200">CREATE YOUR ACCOUNT</p>
           <h1 className="mt-4 text-5xl leading-[1.12] font-bold tracking-[-0.055em] text-balance">
-            학교 이메일로,
+            간단한 정보 입력으로,
             <br />
-            더 안전하게 시작하세요
+            바로 시작하세요
           </h1>
           <p className="mt-7 text-lg leading-8 text-red-100/80">
             학교 구성원 인증을 통해 신뢰할 수 있는 민원 소통 공간을 함께 만듭니다.
@@ -51,12 +51,22 @@ export function SignupPage() {
               <div className="flex size-11 items-center justify-center rounded-xl bg-red-50 text-red-700">
                 <MailCheck className="size-5" aria-hidden="true" />
               </div>
+              <span className="mt-5 inline-flex rounded-full bg-teal-50 px-3 py-1 text-xs font-bold text-teal-700 ring-1 ring-teal-100">
+                회원용 회원가입
+              </span>
               <h2 className="mt-6 text-2xl font-bold tracking-tight text-slate-900">학교 이메일로 회원가입</h2>
               <p className="mt-2 text-sm leading-6 text-slate-500">
-                이메일 인증을 완료한 뒤 필요한 정보만 입력해 가입할 수 있어요.
+                회원용 이메일 인증을 완료한 뒤 필요한 정보만 입력해 가입할 수 있어요.
               </p>
 
               <SignupForm onSuccess={() => navigate('/login?registered=1', { replace: true })} />
+
+              <p className="mt-6 text-center text-sm text-slate-500">
+                관리자 계정이 필요한가요?{' '}
+                <Link className="font-semibold text-teal-700 hover:text-teal-800 hover:underline" to="/admin/signup">
+                  관리자용 회원가입
+                </Link>
+              </p>
             </CardContent>
           </Card>
         </div>

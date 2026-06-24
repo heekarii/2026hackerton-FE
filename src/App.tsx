@@ -1,6 +1,8 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import { HomePage } from '@/pages/HomePage'
+import { AdminLoginPage } from '@/pages/AdminLoginPage'
+import { AdminSignupPage } from '@/pages/AdminSignupPage'
 import { LoginPage } from '@/pages/LoginPage'
 import { SignupPage } from '@/pages/SignupPage'
 import { ComplaintPage } from '@/pages/ComplaintPage'
@@ -59,6 +61,8 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path="/admin/signup" element={<AdminSignupPage />} />
         <Route path="/complaint" element={<ComplaintPage />} />
         <Route path="/mypage" element={<ComplainantPage />} />
         <Route path="*" element={<Navigate replace to="/login" />} />

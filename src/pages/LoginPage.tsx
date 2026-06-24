@@ -4,6 +4,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { SejongUniversityLogo } from '@/components/SejongUniversityLogo'
 import { LoginForm } from '@/features/auth/components/LoginForm'
+import { getLoginRedirectPath } from '@/features/auth/api/login'
 
 const highlights = [
   { icon: MapPinned, label: '지도 기반 민원 접수' },
@@ -61,9 +62,12 @@ export function LoginPage() {
               <div className="flex size-11 items-center justify-center rounded-xl bg-red-50 text-red-700">
                 <ShieldCheck className="size-5" aria-hidden="true" />
               </div>
+              <span className="mt-5 inline-flex rounded-full bg-teal-50 px-3 py-1 text-xs font-bold text-teal-700 ring-1 ring-teal-100">
+                회원용 로그인
+              </span>
               <h2 className="mt-6 text-2xl font-bold tracking-tight text-slate-900">다시 만나 반가워요</h2>
               <p className="mt-2 text-sm leading-6 text-slate-500">
-                학교 계정으로 로그인하고 민원 처리 현황을 확인하세요.
+                회원용 학교 계정으로 로그인하고 민원 처리 현황을 확인하세요.
               </p>
 
               {isRegistered ? (
@@ -73,7 +77,7 @@ export function LoginPage() {
                 </div>
               ) : null}
 
-              <LoginForm onSuccess={() => navigate('/', { replace: true })} />
+              <LoginForm onSuccess={(response) => navigate(getLoginRedirectPath(response), { replace: true })} />
 
               <p className="mt-6 text-center text-sm text-slate-500">
                 아직 계정이 없나요?{' '}

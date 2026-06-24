@@ -6,10 +6,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ApiError } from '@/shared/api/client'
 
-import { login } from '../api/login'
+import { login, type LoginResponse } from '../api/login'
 
 type LoginFormProps = {
-  onSuccess: () => void
+  onSuccess: (response: LoginResponse) => void
 }
 
 type FieldErrors = {
@@ -51,8 +51,8 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     setIsSubmitting(true)
 
     try {
-      await login({ email: email.trim(), password })
-      onSuccess()
+      const response = await login({ email: email.trim(), password })
+      onSuccess(response)
     } catch (error) {
       setFormError(
         error instanceof ApiError
