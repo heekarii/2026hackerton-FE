@@ -1,5 +1,5 @@
-import { ArrowUpRight, Building2, ChartNoAxesCombined, MapPinned, ShieldCheck } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { ArrowUpRight, Building2, ChartNoAxesCombined, CheckCircle2, MapPinned, ShieldCheck } from 'lucide-react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { LoginForm } from '@/features/auth/components/LoginForm'
@@ -12,6 +12,8 @@ const highlights = [
 
 export function LoginPage() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const isRegistered = searchParams.get('registered') === '1'
 
   return (
     <main className="relative grid min-h-svh overflow-hidden bg-slate-50 lg:grid-cols-[1.1fr_0.9fr]">
@@ -74,9 +76,23 @@ export function LoginPage() {
                 학교 계정으로 로그인하고 민원 처리 현황을 확인하세요.
               </p>
 
+              {isRegistered ? (
+                <div className="mt-5 flex gap-3 rounded-xl border border-teal-200 bg-teal-50 px-3.5 py-3 text-sm text-teal-800" role="status">
+                  <CheckCircle2 className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                  <p>회원가입이 완료되었습니다. 새 계정으로 로그인해 주세요.</p>
+                </div>
+              ) : null}
+
               <LoginForm onSuccess={() => navigate('/', { replace: true })} />
 
-              <div className="mt-8 border-t border-slate-100 pt-5 text-center text-xs leading-5 text-slate-400">
+              <p className="mt-6 text-center text-sm text-slate-500">
+                아직 계정이 없나요?{' '}
+                <Link className="font-semibold text-teal-700 hover:text-teal-800 hover:underline" to="/signup">
+                  학교 이메일로 회원가입
+                </Link>
+              </p>
+
+              <div className="mt-6 border-t border-slate-100 pt-5 text-center text-xs leading-5 text-slate-400">
                 로그인하면 서비스 이용약관 및 개인정보 처리방침에 동의하는 것으로 간주됩니다.
               </div>
             </CardContent>

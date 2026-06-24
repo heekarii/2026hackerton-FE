@@ -22,3 +22,11 @@ VITE_OPENAPI_URL=https://two026hackerton-be.onrender.com/openapi.json
 ```bash
 VITE_LOGIN_ENDPOINT=/auth/login
 ```
+
+학교 이메일 인증 회원가입에는 아래 API 경로도 필요합니다.
+
+```bash
+VITE_SIGNUP_SEND_CODE_ENDPOINT=/auth/email-verification/send
+VITE_SIGNUP_VERIFY_CODE_ENDPOINT=/auth/email-verification/verify
+VITE_SIGNUP_ENDPOINT=/auth/signup
+```
