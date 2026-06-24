@@ -4,6 +4,7 @@ import { HomePage } from '@/pages/HomePage'
 import { LoginPage } from '@/pages/LoginPage'
 import { SignupPage } from '@/pages/SignupPage'
 import { ComplaintPage } from '@/pages/ComplaintPage'
+import { ComplainantPage } from '@/pages/ComplainantPage'
 
 export const API_BASE_URL = 'https://two026hackerton-be.onrender.com'
 
@@ -61,6 +62,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/complaint" element={<ComplaintPage />} />
+        <Route path="/mypage" element={<ComplainantPage />} />
         <Route path="*" element={<Navigate replace to="/login" />} />
       </Routes>
     </BrowserRouter>
