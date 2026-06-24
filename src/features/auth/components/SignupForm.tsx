@@ -6,13 +6,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ApiError } from '@/shared/api/client'
 
-import { sendVerificationCode, signup, verifyEmailCode } from '../api/signup'
+import { sendVerificationCode, signup } from '../api/signup'
 
 type SignupFormProps = {
   onSuccess: () => void
 }
 
-type VerificationStatus = 'idle' | 'sent' | 'verified'
+type VerificationStatus = 'idle' | 'verified'
 
 function getErrorMessage(error: unknown) {
   return error instanceof ApiError ? error.message : '요청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.'
@@ -24,7 +24,6 @@ function isValidEmail(email: string) {
 
 export function SignupForm({ onSuccess }: SignupFormProps) {
   const [email, setEmail] = useState('')
-  const [verificationCode, setVerificationCode] = useState('')
   const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>('idle')
   const [verificationToken, setVerificationToken] = useState<string | undefined>()
   const [nickname, setNickname] = useState('')
@@ -34,12 +33,10 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
   const [formError, setFormError] = useState('')
   const [notice, setNotice] = useState('')
   const [isSendingCode, setIsSendingCode] = useState(false)
-  const [isVerifyingCode, setIsVerifyingCode] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   function resetVerification() {
     setVerificationStatus('idle')
-    setVerificationCode('')
     setVerificationToken(undefined)
     setNotice('')
   }
@@ -57,35 +54,16 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
 
     try {
       const response = await sendVerificationCode(email.trim())
-      setVerificationStatus('sent')
-      setNotice(response.message ?? '인증번호를 이메일로 보냈습니다. 받은 편지함을 확인해 주세요.')
+      if (!response.verification_token) {
+        throw new Error('이메일 확인 토큰을 받지 못했습니다.')
+      }
+      setVerificationToken(response.verification_token)
+      setVerificationStatus('verified')
+      setNotice(response.message ?? '학교 이메일 확인이 완료되었습니다.')
     } catch (error) {
       setFormError(getErrorMessage(error))
     } finally {
       setIsSendingCode(false)
-    }
-  }
-
-  async function handleVerifyCode() {
-    setFormError('')
-    setNotice('')
-
-    if (!verificationCode.trim()) {
-      setFormError('이메일로 받은 인증번호를 입력해 주세요.')
-      return
-    }
-
-    setIsVerifyingCode(true)
-
-    try {
-      const response = await verifyEmailCode(email.trim(), verificationCode.trim())
-      setVerificationToken(response.verification_token)
-      setVerificationStatus('verified')
-      setNotice('학교 이메일 인증이 완료되었습니다.')
-    } catch (error) {
-      setFormError(getErrorMessage(error))
-    } finally {
-      setIsVerifyingCode(false)
     }
   }
 
@@ -188,32 +166,12 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
           ) : (
             <Button type="button" variant="outline" disabled={isSendingCode} onClick={handleSendCode}>
               {isSendingCode ? <LoaderCircle className="animate-spin" aria-hidden="true" /> : null}
-              인증번호 받기
+              이메일 확인
             </Button>
           )}
         </div>
         <p className="text-xs leading-5 text-slate-400">소속 학교의 이메일로만 가입할 수 있습니다.</p>
       </section>
-
-      {verificationStatus === 'sent' && (
-        <section className="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <Label htmlFor="verification-code">이메일 인증번호</Label>
-          <div className="flex gap-2">
-            <Input
-              id="verification-code"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              placeholder="이메일로 받은 인증번호 입력"
-              value={verificationCode}
-              onChange={(event) => setVerificationCode(event.target.value)}
-            />
-            <Button type="button" disabled={isVerifyingCode} onClick={handleVerifyCode}>
-              {isVerifyingCode ? <LoaderCircle className="animate-spin" aria-hidden="true" /> : null}
-              확인
-            </Button>
-          </div>
-        </section>
-      )}
 
       <fieldset disabled={!isVerified} className="space-y-5 disabled:opacity-45">
         <div className="space-y-2">
