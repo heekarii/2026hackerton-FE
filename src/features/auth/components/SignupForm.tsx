@@ -83,25 +83,23 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
         </div>
       )}
 
-      {notice && (
-        <div className="flex gap-3 rounded-xl border border-red-200 bg-red-50 px-3.5 py-3 text-sm text-red-800" role="status">
-          <CheckCircle2 className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-          <p>{notice}</p>
-        </div>
-      )}
-
-      <section className="space-y-3">
-        <div className="flex items-center justify-between gap-3">
+      <fieldset className="space-y-5" disabled={isSubmitting}>
+        <div className="space-y-2">
           <Label htmlFor="signup-email">학교 이메일</Label>
-          {isVerified ? (
-            <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-700">
-              <BadgeCheck className="size-3.5" aria-hidden="true" /> 인증 완료
-            </span>
-          ) : null}
+          <div className="relative">
+            <Mail className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+            <Input
+              id="signup-email"
+              type="email"
+              autoComplete="email"
+              placeholder="name@university.ac.kr"
+              value={email}
+              className="pl-10"
+              onChange={(event) => setEmail(event.target.value)}
+            />
+          </div>
         </div>
-      </section>
 
-      <fieldset className="space-y-5">
         <div className="space-y-2">
           <Label htmlFor="nickname">닉네임</Label>
           <Input
