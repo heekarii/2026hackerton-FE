@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import './App.css'
 
@@ -55,6 +55,12 @@ function App() {
   const [images, setImages] = useState<ImagePreview[]>([])
   const [status, setStatus] = useState<SubmissionStatus>('idle')
   const [message, setMessage] = useState('')
+
+  useEffect(() => {
+    if (window.location.pathname !== '/complaint') {
+      window.history.replaceState(null, '', '/complaint')
+    }
+  }, [])
 
   const isReadyToSubmit = useMemo(
     () =>
