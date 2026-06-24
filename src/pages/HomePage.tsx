@@ -254,12 +254,40 @@ const weeklyDensity = [
   [34, 72, 94, 80, 87, 56, 29],
 ]
 
-const locationHotspots = [
-  { name: '공학관', building: '6번', count: 68, x: '33%', y: '48%', category: '시설' },
-  { name: '학생회관', building: '14번', count: 54, x: '70%', y: '45%', category: '학식' },
-  { name: '다산관', building: '23번', count: 37, x: '82%', y: '31%', category: '수업' },
-  { name: '집현관', building: '1번', count: 31, x: '32%', y: '72%', category: '행정' },
-  { name: '군자관', building: '5번', count: 29, x: '37%', y: '57%', category: '시설' },
+type CampusBuilding = {
+  name: string
+  building: string
+  x: string
+  y: string
+  category: CategoryName
+}
+
+const campusBuildings: CampusBuilding[] = [
+  { name: '집현관', building: '1번', x: '32%', y: '72%', category: '행정' },
+  { name: '대학원', building: '2번', x: '35%', y: '83%', category: '수업' },
+  { name: '평생교육원', building: '3번', x: '23%', y: '89%', category: '행정' },
+  { name: '제3연구실', building: '4번', x: '22%', y: '64%', category: '수업' },
+  { name: '군자관', building: '5번', x: '37%', y: '61%', category: '시설' },
+  { name: '광개토관', building: '6번', x: '38%', y: '54%', category: '시설' },
+  { name: '이당관', building: '7번', x: '32%', y: '55%', category: '수업' },
+  { name: '진관홀', building: '8번', x: '42%', y: '46%', category: '시설' },
+  { name: '영덕관', building: '9번', x: '46%', y: '49%', category: '시설' },
+  { name: '학생생활관', building: '10번', x: '43%', y: '41%', category: '행정' },
+  { name: '주차타워', building: '11번', x: '48%', y: '45%', category: '시설' },
+  { name: '애지헌', building: '12번', x: '47%', y: '53%', category: '수업' },
+  { name: '세종관', building: '13번', x: '50%', y: '71%', category: '수업' },
+  { name: '학생회관', building: '14번', x: '71%', y: '50%', category: '학식' },
+  { name: '홍우관', building: '15번', x: '78%', y: '37%', category: '수업' },
+  { name: '박물관', building: '16번', x: '89%', y: '52%', category: '시설' },
+  { name: '새날관', building: '17번', x: '87%', y: '65%', category: '시설' },
+  { name: '영실관', building: '18번', x: '61%', y: '34%', category: '수업' },
+  { name: '세종초등학교', building: '19번', x: '67%', y: '26%', category: '수업' },
+  { name: '광개토초등학교', building: '21번', x: '79%', y: '34%', category: '수업' },
+  { name: '주차빌딩', building: '22번', x: '83%', y: '39%', category: '시설' },
+  { name: '다산관', building: '23번', x: '82%', y: '45%', category: '수업' },
+  { name: '음악관', building: '24번', x: '67%', y: '42%', category: '수업' },
+  { name: '우정당', building: '25번', x: '74%', y: '50%', category: '시설' },
+  { name: '무방관', building: '26번', x: '66%', y: '16%', category: '시설' },
 ]
 
 const similarCases: SimilarCase[] = [
@@ -521,7 +549,7 @@ function buildWeeklyDensity(records: ComplaintRecord[]) {
 }
 
 function buildHotspotMetrics(records: ComplaintRecord[]) {
-  return locationHotspots.map((spot) => {
+  return campusBuildings.map((spot) => {
     const matching = records.filter((record) => record.location.includes(spot.name))
     const categoryCounts = new Map<CategoryName, number>()
     matching.forEach((record) => {
@@ -531,7 +559,7 @@ function buildHotspotMetrics(records: ComplaintRecord[]) {
     const dominantCategory = [...categoryCounts.entries()].sort((left, right) => right[1] - left[1])[0]?.[0]
 
     return { ...spot, count: matching.length, category: dominantCategory ?? spot.category }
-  })
+  }).filter((spot) => spot.count > 0)
 }
 
 function buildTrendingComplaints(records: ComplaintRecord[]) {
@@ -561,7 +589,7 @@ function HomePage() {
   const [campusFilter, setCampusFilter] = useState('전체 캠퍼스')
   const [selectedCategory, setSelectedCategory] = useState<CategoryName>('시설')
   const [analysisCategory, setAnalysisCategory] = useState<'전체' | CategoryName>('전체')
-  const [selectedHotspot, setSelectedHotspot] = useState(locationHotspots[0])
+  const [selectedHotspot, setSelectedHotspot] = useState(campusBuildings[0])
   const [selectedDepartmentName, setSelectedDepartmentName] = useState('학사지원과')
   const [workflowSubject, setWorkflowSubject] = useState('본관 증명서 발급 지연 개선')
   const [workflow, setWorkflow] = useState<WorkflowDraft | null>(null)
@@ -575,7 +603,7 @@ function HomePage() {
   const [categoryMetrics, setCategoryMetrics] = useState(categories)
   const [timeMetrics, setTimeMetrics] = useState(timeSlots)
   const [densityMetrics, setDensityMetrics] = useState(weeklyDensity)
-  const [hotspotMetrics, setHotspotMetrics] = useState(locationHotspots)
+  const [hotspotMetrics, setHotspotMetrics] = useState<Array<CampusBuilding & { count: number }>>([])
   const [trendingMetrics, setTrendingMetrics] = useState(trendingComplaints)
   const [analyticsStatus, setAnalyticsStatus] = useState<'loading' | 'live' | 'fallback'>('loading')
   const [analyticsError, setAnalyticsError] = useState('')
@@ -648,6 +676,10 @@ function HomePage() {
         ? filteredHotspotMetrics
         : filteredHotspotMetrics.filter((spot) => spot.category === analysisCategory),
     [analysisCategory, filteredHotspotMetrics],
+  )
+  const activeHotspot = useMemo(
+    () => visibleHotspots.find((spot) => spot.name === selectedHotspot.name) ?? visibleHotspots[0] ?? null,
+    [selectedHotspot.name, visibleHotspots],
   )
   const selectedDepartment = findDepartment(selectedDepartmentName)
   const aiCategory = analysisResult?.category ?? selectedCategory
@@ -1220,23 +1252,29 @@ function HomePage() {
         <div className="mt-5 grid gap-5 lg:grid-cols-[320px_minmax(0,1fr)] xl:grid-cols-[360px_minmax(0,1fr)]">
           <section className="rounded-lg border border-slate-200 bg-slate-950 p-5 text-white">
             <p className="text-sm font-semibold text-teal-200">선택 핫스팟</p>
-            <h3 className="mt-1 text-2xl font-black">{selectedHotspot.name} <span className="text-slate-400">{selectedHotspot.building}</span></h3>
-            <dl className="mt-6 grid gap-3">
-              <div className="flex items-center justify-between border-b border-white/10 pb-3"><dt className="text-sm text-slate-300">최근 7일 접수</dt><dd className="text-xl font-black">{selectedHotspot.count}건</dd></div>
-              <div className="flex items-center justify-between border-b border-white/10 pb-3"><dt className="text-sm text-slate-300">주요 분류</dt><dd className="font-bold">{selectedHotspot.category}</dd></div>
-              <div className="flex items-center justify-between"><dt className="text-sm text-slate-300">피크 시간</dt><dd className="font-bold">16:00 - 17:00</dd></div>
-            </dl>
-            <Button className="mt-6 w-full bg-white text-slate-950 hover:bg-slate-100" size="sm" onClick={() => createWorkflow(categoryDepartments[selectedHotspot.category as CategoryName], `${selectedHotspot.name} 반복 민원 조치`)}>
-              <Route aria-hidden="true" />
-              현장 조치 워크플로우
-            </Button>
+            {activeHotspot ? (
+              <>
+                <h3 className="mt-1 text-2xl font-black">{activeHotspot.name} <span className="text-slate-400">{activeHotspot.building}</span></h3>
+                <dl className="mt-6 grid gap-3">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-3"><dt className="text-sm text-slate-300">최근 7일 접수</dt><dd className="text-xl font-black">{activeHotspot.count}건</dd></div>
+                  <div className="flex items-center justify-between border-b border-white/10 pb-3"><dt className="text-sm text-slate-300">주요 분류</dt><dd className="font-bold">{activeHotspot.category}</dd></div>
+                  <div className="flex items-center justify-between"><dt className="text-sm text-slate-300">피크 시간</dt><dd className="font-bold">16:00 - 17:00</dd></div>
+                </dl>
+                <Button className="mt-6 w-full bg-white text-slate-950 hover:bg-slate-100" size="sm" onClick={() => createWorkflow(categoryDepartments[activeHotspot.category], `${activeHotspot.name} 반복 민원 조치`)}>
+                  <Route aria-hidden="true" />
+                  현장 조치 워크플로우
+                </Button>
+              </>
+            ) : (
+              <p className="mt-4 text-sm leading-6 text-slate-300">현재 필터에서 민원이 1건 이상 접수된 건물이 없습니다.</p>
+            )}
           </section>
 
           <div className="min-w-0">
             <div className="relative aspect-[527/458] overflow-hidden rounded-lg border border-slate-200 bg-[#edf3ea]">
               <img src="/campus-map.png" alt="캠퍼스 건물 배치도와 민원 핫스팟" className="absolute inset-0 size-full object-contain" />
               {visibleHotspots.map((spot) => {
-                const isActive = selectedHotspot.name === spot.name
+                const isActive = activeHotspot?.name === spot.name
                 return (
                   <button
                     key={spot.name}
@@ -1256,7 +1294,7 @@ function HomePage() {
               })}
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
-              {visibleHotspots.map((spot) => <button key={spot.name} type="button" onClick={() => setSelectedHotspot(spot)} className={cn('rounded-md border px-3 py-2 text-xs font-bold', selectedHotspot.name === spot.name ? 'border-teal-700 bg-teal-50 text-teal-800' : 'border-slate-200 text-slate-600 hover:bg-slate-50')}>{spot.name} {spot.count}건</button>)}
+              {visibleHotspots.map((spot) => <button key={spot.name} type="button" onClick={() => setSelectedHotspot(spot)} className={cn('rounded-md border px-3 py-2 text-xs font-bold', activeHotspot?.name === spot.name ? 'border-teal-700 bg-teal-50 text-teal-800' : 'border-slate-200 text-slate-600 hover:bg-slate-50')}>{spot.name} {spot.count}건</button>)}
             </div>
           </div>
         </div>

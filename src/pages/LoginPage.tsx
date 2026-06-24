@@ -32,7 +32,7 @@ export function LoginPage() {
 
         <div className="relative my-auto max-w-xl pb-16">
           <p className="mb-5 text-sm font-bold tracking-[0.2em] text-teal-200">CAMPUS VOICE</p>
-          <h1 className="text-5xl leading-[1.12] font-bold tracking-[-0.055em] text-balance">
+          <h1 className="text-5xl leading-[1.12] font-bold tracking-[-0.055em] text-balance text-white">
             더 나은 캠퍼스를 만드는,
             <br />
             가장 빠른 목소리

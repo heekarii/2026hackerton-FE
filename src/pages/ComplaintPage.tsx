@@ -1,8 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import '@/App.css'
 
-import { apiRequest } from '@/shared/api/client'
 import { createComplaint } from '@/features/complaints/api/complaints'
 
 const categories = [
@@ -58,6 +57,7 @@ export function ComplaintPage() {
   const [images, setImages] = useState<ImagePreview[]>([])
   const [status, setStatus] = useState<SubmissionStatus>('idle')
   const [message, setMessage] = useState('')
+  const isSubmittingRef = useRef(false)
 
   const isReadyToSubmit = useMemo(
     () =>
@@ -91,12 +91,15 @@ export function ComplaintPage() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
+    if (isSubmittingRef.current) return
+
     if (!isReadyToSubmit) {
       setStatus('error')
       setMessage('필수 항목을 채운 뒤 다시 제출해 주세요.')
       return
     }
 
+    isSubmittingRef.current = true
     setStatus('submitting')
     setMessage('AI 분석을 위해 민원 내용을 전송하고 있어요.')
 
@@ -110,13 +113,6 @@ export function ComplaintPage() {
     }
 
     try {
-      await apiRequest('/complaints', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      })
       await createComplaint(payload)
 
       setStatus('success')
@@ -126,6 +122,8 @@ export function ComplaintPage() {
       setMessage(
         '민원 등록 요청에 실패했어요. 잠시 후 다시 시도해 주세요.',
       )
+    } finally {
+      isSubmittingRef.current = false
     }
   }
 
