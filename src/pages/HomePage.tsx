@@ -5,7 +5,6 @@ import {
   BarChart3,
   BellRing,
   Bot,
-  Building2,
   CalendarDays,
   CheckCircle2,
   ChevronRight,
@@ -37,6 +36,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
+import { SejongUniversityLogo } from '@/components/SejongUniversityLogo'
 import { clearAccessToken } from '@/features/auth/auth-storage'
 import { analyzeComplaint, type ComplaintAnalysis } from '@/features/complaints/api/analyze'
 import {
@@ -112,9 +112,9 @@ const categories: ComplaintCategory[] = [
     averageDays: 4.2,
     urgent: 12,
     department: '시설관리팀',
-    color: 'bg-teal-700',
-    softColor: 'bg-teal-50 text-teal-700',
-    ringColor: 'ring-teal-200',
+    color: 'bg-red-700',
+    softColor: 'bg-red-50 text-red-700',
+    ringColor: 'ring-red-200',
   },
   {
     name: '수업',
@@ -368,7 +368,7 @@ const navItems: Array<{ id: AdminView; icon: typeof LayoutDashboard; label: stri
 function getHeatColor(value: number) {
   if (value > 85) return 'bg-rose-500 text-white'
   if (value > 70) return 'bg-amber-500 text-white'
-  if (value > 45) return 'bg-teal-600 text-white'
+  if (value > 45) return 'bg-red-600 text-white'
   return 'bg-slate-200 text-slate-600'
 }
 
@@ -880,7 +880,7 @@ function HomePage() {
         <section className="min-w-0 rounded-lg border border-slate-200 bg-white p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <p className="text-sm font-semibold text-teal-700">전체 접수 현황</p>
+              <p className="text-sm font-semibold text-red-700">전체 접수 현황</p>
               <h2 className="mt-1 text-2xl font-black tracking-tight">카테고리별 민원 집계</h2>
               <p className="mt-1 text-sm text-slate-500">
                 총 {totalComplaints.toLocaleString()}건을 범주화하고 우선 처리 영역을 계산했습니다.
@@ -892,9 +892,9 @@ function HomePage() {
             </Button>
           </div>
 
-          <div className={cn('mt-4 flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between', analyticsStatus === 'live' ? 'border-teal-200 bg-teal-50' : analyticsStatus === 'loading' ? 'border-slate-200 bg-slate-50' : 'border-amber-200 bg-amber-50')}>
+          <div className={cn('mt-4 flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between', analyticsStatus === 'live' ? 'border-red-200 bg-red-50' : analyticsStatus === 'loading' ? 'border-slate-200 bg-slate-50' : 'border-amber-200 bg-amber-50')}>
             <div>
-              <p className={cn('text-sm font-bold', analyticsStatus === 'live' ? 'text-teal-800' : 'text-slate-700')}>
+              <p className={cn('text-sm font-bold', analyticsStatus === 'live' ? 'text-red-800' : 'text-slate-700')}>
                 {analyticsStatus === 'live' ? `선택 조건의 실제 민원 ${filteredComplaints.length}건을 AI 분류 기준으로 집계 중` : analyticsStatus === 'loading' ? '실제 민원 데이터를 불러오는 중' : '데모 집계 표시 중'}
               </p>
               <p className="mt-1 text-xs text-slate-600">{analyticsError || `미분류 민원 ${unclassifiedComplaints.length}건은 AI 분류 후 통계에 반영할 수 있습니다.`}</p>
@@ -904,7 +904,7 @@ function HomePage() {
               <Button size="sm" disabled={isReclassifying || !unclassifiedComplaints.length} onClick={() => void reclassifyUnclassifiedComplaints()}><Sparkles className={cn(isReclassifying && 'animate-spin')} aria-hidden="true" />{isReclassifying ? 'AI 분류 중...' : `미분류 ${unclassifiedComplaints.length}건 분류`}</Button>
             </div>
           </div>
-          {reclassificationMessage ? <p className="mt-3 text-sm font-semibold text-teal-700">{reclassificationMessage}</p> : null}
+          {reclassificationMessage ? <p className="mt-3 text-sm font-semibold text-red-700">{reclassificationMessage}</p> : null}
 
           <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {filteredCategoryMetrics.map((category) => {
@@ -953,11 +953,11 @@ function HomePage() {
         <section className="min-w-0 rounded-lg border border-slate-200 bg-slate-950 p-5 text-white">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold text-teal-200">선택 카테고리</p>
+              <p className="text-sm font-semibold text-red-200">선택 카테고리</p>
               <h2 className="mt-1 text-2xl font-black">{selected.name}</h2>
             </div>
             <span className="grid size-11 place-items-center rounded-lg bg-white/10">
-              <Activity className="size-5 text-teal-200" aria-hidden="true" />
+              <Activity className="size-5 text-red-200" aria-hidden="true" />
             </span>
           </div>
           <dl className="mt-6 grid grid-cols-2 gap-3">
@@ -997,7 +997,7 @@ function HomePage() {
                     : '민원 API 연결 후 원문이 표시됩니다.'}
                 </p>
               </div>
-              <span className="rounded-md bg-white/10 px-2.5 py-1 text-xs font-black text-teal-100">
+              <span className="rounded-md bg-white/10 px-2.5 py-1 text-xs font-black text-red-100">
                 {selectedComplaints.length}건
               </span>
             </div>
@@ -1064,7 +1064,7 @@ function HomePage() {
                 {selectedSimilarCases.map((caseItem) => (
                   <tr key={caseItem.title}>
                     <td className="px-4 py-3 font-semibold text-slate-900">{caseItem.title}</td>
-                    <td className="px-4 py-3"><span className="rounded-md bg-teal-50 px-2 py-1 text-xs font-bold text-teal-700">{caseItem.matchRate}%</span></td>
+                    <td className="px-4 py-3"><span className="rounded-md bg-red-50 px-2 py-1 text-xs font-bold text-red-700">{caseItem.matchRate}%</span></td>
                     <td className="px-4 py-3 text-slate-600">{caseItem.solvedBy}</td>
                     <td className="px-4 py-3 text-slate-600">{caseItem.result}</td>
                     <td className="px-4 py-3 font-semibold text-slate-900">{caseItem.days}일</td>
@@ -1166,14 +1166,14 @@ function HomePage() {
       <section className="rounded-lg border border-slate-200 bg-white p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <p className="text-sm font-semibold text-teal-700">반복 민원 감지</p>
+            <p className="text-sm font-semibold text-red-700">반복 민원 감지</p>
             <h2 className="mt-1 text-2xl font-black tracking-tight">시간·위치 분석</h2>
             <p className="mt-1 text-sm text-slate-500">반복 발생 구간과 건물별 접수 밀도를 함께 확인합니다.</p>
           </div>
           <label className="grid gap-1 text-xs font-bold text-slate-500">
             카테고리 필터
             <select
-              className="h-10 min-w-40 rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-800 outline-none focus:border-teal-600"
+              className="h-10 min-w-40 rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-800 outline-none focus:border-red-600"
               value={analysisCategory}
               onChange={(event) => setAnalysisCategory(event.target.value as '전체' | CategoryName)}
             >
@@ -1209,12 +1209,12 @@ function HomePage() {
             <div className="mt-5 grid gap-3 sm:grid-cols-3">
               <div className="rounded-md bg-rose-50 p-3"><p className="text-xs font-bold text-rose-700">최다 시간대</p><p className="mt-1 text-lg font-black text-rose-950">수요일 16시</p></div>
               <div className="rounded-md bg-amber-50 p-3"><p className="text-xs font-bold text-amber-800">반복 패턴</p><p className="mt-1 text-lg font-black text-amber-950">점심 전후</p></div>
-              <div className="rounded-md bg-teal-50 p-3"><p className="text-xs font-bold text-teal-700">권장 조치</p><p className="mt-1 text-lg font-black text-teal-950">순찰 인력 증원</p></div>
+              <div className="rounded-md bg-red-50 p-3"><p className="text-xs font-bold text-red-700">권장 조치</p><p className="mt-1 text-lg font-black text-red-950">순찰 인력 증원</p></div>
             </div>
           </section>
 
           <section className="rounded-lg border border-slate-200 bg-slate-950 p-5 text-white">
-            <p className="text-sm font-semibold text-teal-200">선택 핫스팟</p>
+            <p className="text-sm font-semibold text-red-200">선택 핫스팟</p>
             <h3 className="mt-1 text-2xl font-black">{selectedHotspot.name} <span className="text-slate-400">{selectedHotspot.building}</span></h3>
             <dl className="mt-6 grid gap-3">
               <div className="flex items-center justify-between border-b border-white/10 pb-3"><dt className="text-sm text-slate-300">최근 7일 접수</dt><dd className="text-xl font-black">{selectedHotspot.count}건</dd></div>
@@ -1254,7 +1254,7 @@ function HomePage() {
           })}
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
-          {visibleHotspots.map((spot) => <button key={spot.name} type="button" onClick={() => setSelectedHotspot(spot)} className={cn('rounded-md border px-3 py-2 text-xs font-bold', selectedHotspot.name === spot.name ? 'border-teal-700 bg-teal-50 text-teal-800' : 'border-slate-200 text-slate-600 hover:bg-slate-50')}>{spot.name} {spot.count}건</button>)}
+          {visibleHotspots.map((spot) => <button key={spot.name} type="button" onClick={() => setSelectedHotspot(spot)} className={cn('rounded-md border px-3 py-2 text-xs font-bold', selectedHotspot.name === spot.name ? 'border-red-700 bg-red-50 text-red-800' : 'border-slate-200 text-slate-600 hover:bg-slate-50')}>{spot.name} {spot.count}건</button>)}
         </div>
       </section>
     </div>
@@ -1264,15 +1264,15 @@ function HomePage() {
     <div className="grid gap-5">
       <section className="rounded-lg border border-slate-200 bg-white p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div><p className="text-sm font-semibold text-teal-700">담당 부서 연결</p><h2 className="mt-1 text-2xl font-black tracking-tight">부서 디렉터리와 처리 워크플로우</h2><p className="mt-1 text-sm text-slate-500">민원 분류 결과를 바탕으로 담당 부서 연결과 후속 작업을 생성합니다.</p></div>
+          <div><p className="text-sm font-semibold text-red-700">담당 부서 연결</p><h2 className="mt-1 text-2xl font-black tracking-tight">부서 디렉터리와 처리 워크플로우</h2><p className="mt-1 text-sm text-slate-500">민원 분류 결과를 바탕으로 담당 부서 연결과 후속 작업을 생성합니다.</p></div>
           <Button variant="outline" size="sm" onClick={() => setActiveView('ai')}><Bot aria-hidden="true" />AI로 부서 추천</Button>
         </div>
         <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {departments.map((department) => {
             const isSelected = selectedDepartmentName === department.name
             return (
-              <button key={department.name} type="button" onClick={() => setSelectedDepartmentName(department.name)} className={cn('rounded-lg border p-4 text-left transition', isSelected ? 'border-teal-700 bg-teal-50 ring-2 ring-teal-100' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50')}>
-                <div className="flex items-start justify-between gap-3"><div><p className="text-base font-black text-slate-950">{department.name}</p><p className="mt-1 text-xs font-bold text-teal-700">{department.queue}</p></div><Phone className="size-4 text-slate-400" aria-hidden="true" /></div>
+              <button key={department.name} type="button" onClick={() => setSelectedDepartmentName(department.name)} className={cn('rounded-lg border p-4 text-left transition', isSelected ? 'border-red-700 bg-red-50 ring-2 ring-red-100' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50')}>
+                <div className="flex items-start justify-between gap-3"><div><p className="text-base font-black text-slate-950">{department.name}</p><p className="mt-1 text-xs font-bold text-red-700">{department.queue}</p></div><Phone className="size-4 text-slate-400" aria-hidden="true" /></div>
                 <p className="mt-3 text-sm font-semibold text-slate-700">{department.phone}</p>
                 <p className="mt-2 text-xs leading-5 text-slate-500">{department.duties}</p>
               </button>
@@ -1283,24 +1283,24 @@ function HomePage() {
 
       <div className="grid gap-5 xl:grid-cols-[380px_minmax(0,1fr)]">
         <section className="rounded-lg border border-slate-200 bg-white p-5">
-          <div className="flex items-center gap-2"><Workflow className="size-5 text-teal-700" aria-hidden="true" /><div><p className="text-sm font-semibold text-slate-500">워크플로우 생성</p><h2 className="mt-1 text-lg font-black">담당 부서 작업 요청</h2></div></div>
+          <div className="flex items-center gap-2"><Workflow className="size-5 text-red-700" aria-hidden="true" /><div><p className="text-sm font-semibold text-slate-500">워크플로우 생성</p><h2 className="mt-1 text-lg font-black">담당 부서 작업 요청</h2></div></div>
           <div className="mt-5 grid gap-4">
-            <label className="grid gap-2 text-sm font-bold text-slate-700">담당 부서<select className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold outline-none focus:border-teal-600" value={selectedDepartmentName} onChange={(event) => setSelectedDepartmentName(event.target.value)}>{departments.map((department) => <option key={department.name} value={department.name}>{department.name}</option>)}</select></label>
-            <div className="rounded-md bg-slate-50 p-3"><p className="text-xs font-bold text-slate-500">연락처</p><a className="mt-1 inline-flex items-center gap-2 text-sm font-black text-teal-700 hover:underline" href={`tel:${selectedDepartment.phone.replace(/[^0-9]/g, '')}`}><Phone className="size-4" aria-hidden="true" />{selectedDepartment.phone}</a><p className="mt-2 text-xs leading-5 text-slate-500">{selectedDepartment.duties}</p></div>
-            <label className="grid gap-2 text-sm font-bold text-slate-700">민원 제목<input className="h-10 rounded-md border border-slate-200 px-3 text-sm font-medium outline-none focus:border-teal-600" value={workflowSubject} onChange={(event) => setWorkflowSubject(event.target.value)} /></label>
+            <label className="grid gap-2 text-sm font-bold text-slate-700">담당 부서<select className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm font-semibold outline-none focus:border-red-600" value={selectedDepartmentName} onChange={(event) => setSelectedDepartmentName(event.target.value)}>{departments.map((department) => <option key={department.name} value={department.name}>{department.name}</option>)}</select></label>
+            <div className="rounded-md bg-slate-50 p-3"><p className="text-xs font-bold text-slate-500">연락처</p><a className="mt-1 inline-flex items-center gap-2 text-sm font-black text-red-700 hover:underline" href={`tel:${selectedDepartment.phone.replace(/[^0-9]/g, '')}`}><Phone className="size-4" aria-hidden="true" />{selectedDepartment.phone}</a><p className="mt-2 text-xs leading-5 text-slate-500">{selectedDepartment.duties}</p></div>
+            <label className="grid gap-2 text-sm font-bold text-slate-700">민원 제목<input className="h-10 rounded-md border border-slate-200 px-3 text-sm font-medium outline-none focus:border-red-600" value={workflowSubject} onChange={(event) => setWorkflowSubject(event.target.value)} /></label>
             <Button onClick={() => createWorkflow()}><Plus aria-hidden="true" />워크플로우 생성</Button>
           </div>
         </section>
 
         <section className="min-w-0 rounded-lg border border-slate-200 bg-white p-5">
-          <div className="flex items-center justify-between gap-3"><div><p className="text-sm font-semibold text-slate-500">처리 현황</p><h2 className="mt-1 text-lg font-black">{workflow ? workflow.title : '생성된 워크플로우가 없습니다'}</h2></div>{workflow ? <span className="rounded-md bg-teal-50 px-2.5 py-1 text-xs font-bold text-teal-700">{workflow.department.name}</span> : null}</div>
+          <div className="flex items-center justify-between gap-3"><div><p className="text-sm font-semibold text-slate-500">처리 현황</p><h2 className="mt-1 text-lg font-black">{workflow ? workflow.title : '생성된 워크플로우가 없습니다'}</h2></div>{workflow ? <span className="rounded-md bg-red-50 px-2.5 py-1 text-xs font-bold text-red-700">{workflow.department.name}</span> : null}</div>
           {workflow ? (
             <ol className="mt-6 grid gap-3">
               {workflow.items.map((item, index) => (
                 <li key={item.id} className="grid gap-3 rounded-lg border border-slate-200 p-4 sm:grid-cols-[32px_minmax(0,1fr)_auto] sm:items-center">
-                  <span className={cn('grid size-8 place-items-center rounded-full text-xs font-black', item.status === '완료' ? 'bg-teal-700 text-white' : item.status === '진행 중' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-500')}>{item.status === '완료' ? <CheckCircle2 className="size-4" aria-hidden="true" /> : index + 1}</span>
+                  <span className={cn('grid size-8 place-items-center rounded-full text-xs font-black', item.status === '완료' ? 'bg-red-700 text-white' : item.status === '진행 중' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-500')}>{item.status === '완료' ? <CheckCircle2 className="size-4" aria-hidden="true" /> : index + 1}</span>
                   <div><p className="text-sm font-black text-slate-900">{item.task}</p><p className="mt-1 text-xs text-slate-500">{item.owner} · {item.due}</p></div>
-                  <button type="button" className={cn('rounded-md px-2.5 py-1.5 text-xs font-bold', item.status === '완료' ? 'bg-slate-100 text-slate-600' : 'bg-teal-50 text-teal-700 hover:bg-teal-100')} onClick={() => advanceWorkflowItem(item.id)}>{item.status === '완료' ? '다시 열기' : item.status === '진행 중' ? '완료 처리' : '시작'}</button>
+                  <button type="button" className={cn('rounded-md px-2.5 py-1.5 text-xs font-bold', item.status === '완료' ? 'bg-slate-100 text-slate-600' : 'bg-red-50 text-red-700 hover:bg-red-100')} onClick={() => advanceWorkflowItem(item.id)}>{item.status === '완료' ? '다시 열기' : item.status === '진행 중' ? '완료 처리' : '시작'}</button>
                 </li>
               ))}
             </ol>
@@ -1315,18 +1315,18 @@ function HomePage() {
   const aiView = (
     <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_380px]">
       <section className="min-w-0 rounded-lg border border-slate-200 bg-white p-5">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-sm font-semibold text-teal-700">Swagger 연결: POST /openai/analyze</p><h2 className="mt-1 text-2xl font-black tracking-tight">AI 민원 분석과 처리 예측</h2><p className="mt-1 text-sm text-slate-500">분류, 민감도, 긴급도, 담당 부서, 예상 처리 기간을 실제 분석 API에서 받습니다.</p></div><Bot className="size-8 text-teal-700" aria-hidden="true" /></div>
-        <label className="mt-6 grid gap-2 text-sm font-bold text-slate-700">분석할 민원 내용<textarea className="min-h-40 resize-y rounded-lg border border-slate-200 p-3 text-sm leading-6 font-medium outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-600/15" value={analysisText} onChange={(event) => setAnalysisText(event.target.value)} /></label>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-sm font-semibold text-red-700">Swagger 연결: POST /openai/analyze</p><h2 className="mt-1 text-2xl font-black tracking-tight">AI 민원 분석과 처리 예측</h2><p className="mt-1 text-sm text-slate-500">분류, 민감도, 긴급도, 담당 부서, 예상 처리 기간을 실제 분석 API에서 받습니다.</p></div><Bot className="size-8 text-red-700" aria-hidden="true" /></div>
+        <label className="mt-6 grid gap-2 text-sm font-bold text-slate-700">분석할 민원 내용<textarea className="min-h-40 resize-y rounded-lg border border-slate-200 p-3 text-sm leading-6 font-medium outline-none focus:border-red-600 focus:ring-2 focus:ring-red-600/15" value={analysisText} onChange={(event) => setAnalysisText(event.target.value)} /></label>
         {analysisError ? <p className="mt-3 rounded-md bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">{analysisError}</p> : null}
         <div className="mt-4 flex flex-wrap gap-2"><Button disabled={isAnalyzing} onClick={handleAnalyze}>{isAnalyzing ? <LoaderCircle className="animate-spin" aria-hidden="true" /> : <Sparkles aria-hidden="true" />}{isAnalyzing ? 'AI 분석 중...' : 'AI 분석 실행'}</Button><Button variant="outline" size="sm" onClick={() => setAnalysisText('강의실 프로젝터가 반복해서 꺼져 수업 진행이 어렵습니다. 다음 수업 전 점검과 교체가 필요합니다.')}><RefreshCw aria-hidden="true" />예시 입력</Button></div>
 
         {analysisResult ? (
-          <section className="mt-6 rounded-lg border border-teal-200 bg-teal-50/60 p-5">
-            <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-sm font-semibold text-teal-700">AI 분석 결과</p><h3 className="mt-1 text-xl font-black text-slate-950">{analysisResult.summary}</h3></div><span className={cn('rounded-md px-2.5 py-1 text-xs font-black', getUrgencyClass(analysisResult.urgency))}>{getUrgencyLabel(analysisResult.urgency)}</span></div>
+          <section className="mt-6 rounded-lg border border-red-200 bg-red-50/60 p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-sm font-semibold text-red-700">AI 분석 결과</p><h3 className="mt-1 text-xl font-black text-slate-950">{analysisResult.summary}</h3></div><span className={cn('rounded-md px-2.5 py-1 text-xs font-black', getUrgencyClass(analysisResult.urgency))}>{getUrgencyLabel(analysisResult.urgency)}</span></div>
             <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {[['카테고리', analysisResult.category], ['세부 유형', analysisResult.subcategory], ['감정', analysisResult.sentiment], ['추천 부서', analysisResult.department], ['예상 처리', analysisResult.expected_days], ['위험 유형', analysisResult.risk_type]].map(([label, value]) => <div key={label} className="rounded-md bg-white p-3"><p className="text-xs font-bold text-slate-500">{label}</p><p className="mt-1 text-sm font-black text-slate-900">{value}</p></div>)}
             </div>
-            <div className="mt-4 rounded-md border border-teal-100 bg-white p-3"><p className="text-xs font-bold text-slate-500">권장 조치</p><p className="mt-1 text-sm leading-6 text-slate-700">{analysisResult.recommended_action}</p><div className="mt-3 flex flex-wrap gap-2">{analysisResult.keywords.map((keyword) => <span key={keyword} className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600">#{keyword}</span>)}</div></div>
+            <div className="mt-4 rounded-md border border-red-100 bg-white p-3"><p className="text-xs font-bold text-slate-500">권장 조치</p><p className="mt-1 text-sm leading-6 text-slate-700">{analysisResult.recommended_action}</p><div className="mt-3 flex flex-wrap gap-2">{analysisResult.keywords.map((keyword) => <span key={keyword} className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600">#{keyword}</span>)}</div></div>
             {analysisNeedsNotification ? <div className="mt-4 flex items-start gap-3 rounded-md bg-rose-50 p-3 text-rose-800"><BellRing className="mt-0.5 size-4 shrink-0" aria-hidden="true" /><p className="text-sm font-bold">민감 또는 고긴급 민원으로 분류되어 관리자 직접 통보 큐에 추가되었습니다.</p></div> : null}
           </section>
         ) : null}
@@ -1334,18 +1334,18 @@ function HomePage() {
 
       <aside className="grid content-start gap-5">
         <section className="rounded-lg border border-slate-200 bg-white p-5"><div className="flex items-center justify-between gap-3"><div><p className="text-sm font-semibold text-slate-500">분석 반영 추정</p><h2 className="mt-1 text-lg font-black">ROI·예산·영향 인원</h2></div><CircleDollarSign className="size-5 text-slate-400" aria-hidden="true" /></div><p className="mt-3 text-xs leading-5 text-slate-500">AI 분류 카테고리와 과거 해결 사례를 바탕으로 산출한 운영 추정치입니다.</p><dl className="mt-4 grid gap-3"><div className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 p-3"><dt className="flex items-center gap-2 text-sm font-semibold text-slate-600"><BarChart3 className="size-4 text-slate-400" aria-hidden="true" />예상 예산</dt><dd className="text-sm font-black text-slate-950">{aiEstimate.budget}</dd></div><div className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 p-3"><dt className="flex items-center gap-2 text-sm font-semibold text-slate-600"><Users className="size-4 text-slate-400" aria-hidden="true" />예상 영향 인원</dt><dd className="text-sm font-black text-slate-950">{aiEstimate.people}</dd></div><div className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 p-3"><dt className="flex items-center gap-2 text-sm font-semibold text-slate-600"><Activity className="size-4 text-slate-400" aria-hidden="true" />재접수 감소 ROI</dt><dd className="text-sm font-black text-slate-950">{aiEstimate.roi}</dd></div></dl></section>
-        <section className="rounded-lg border border-slate-200 bg-white p-5"><div className="flex items-center gap-2"><ClipboardCheck className="size-5 text-teal-700" aria-hidden="true" /><div><p className="text-sm font-semibold text-slate-500">다음 작업</p><h2 className="mt-1 text-lg font-black">담당 부서 전달</h2></div></div><p className="mt-4 text-sm leading-6 text-slate-600">{analysisResult ? `${analysisResult.department}에 ${analysisResult.expected_days} 처리 목표로 워크플로우를 생성합니다.` : 'AI 분석을 완료하면 추천 부서와 긴급도 기준 작업을 바로 만들 수 있습니다.'}</p><Button className="mt-5 w-full" disabled={!analysisResult} onClick={() => analysisResult && createWorkflow(analysisResult.department, analysisResult.summary)}><Send aria-hidden="true" />워크플로우로 전달</Button></section>
+        <section className="rounded-lg border border-slate-200 bg-white p-5"><div className="flex items-center gap-2"><ClipboardCheck className="size-5 text-red-700" aria-hidden="true" /><div><p className="text-sm font-semibold text-slate-500">다음 작업</p><h2 className="mt-1 text-lg font-black">담당 부서 전달</h2></div></div><p className="mt-4 text-sm leading-6 text-slate-600">{analysisResult ? `${analysisResult.department}에 ${analysisResult.expected_days} 처리 목표로 워크플로우를 생성합니다.` : 'AI 분석을 완료하면 추천 부서와 긴급도 기준 작업을 바로 만들 수 있습니다.'}</p><Button className="mt-5 w-full" disabled={!analysisResult} onClick={() => analysisResult && createWorkflow(analysisResult.department, analysisResult.summary)}><Send aria-hidden="true" />워크플로우로 전달</Button></section>
       </aside>
     </div>
   )
 
   const reportsView = (
     <div className="grid gap-5">
-      <section className="rounded-lg border border-slate-200 bg-white p-5"><div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"><div><p className="text-sm font-semibold text-teal-700">학기별·연말 통계</p><h2 className="mt-1 text-2xl font-black tracking-tight">민원 통계 리포트</h2><p className="mt-1 text-sm text-slate-500">카테고리, 긴급도, 처리 SLA, 영향도를 한 번에 정리합니다.</p></div><div className="flex items-center gap-2"><div className="inline-flex rounded-lg bg-slate-100 p-1">{(['2026-1학기', '연말'] as const).map((period) => <button key={period} type="button" className={cn('h-8 rounded-md px-3 text-xs font-bold transition', reportPeriod === period ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500')} onClick={() => setReportPeriod(period)}>{period}</button>)}</div><Button variant="outline" size="sm" onClick={downloadReport}><Download aria-hidden="true" />CSV</Button></div></div>
-        <div className="mt-6 grid gap-3 md:grid-cols-3">{[["접수 민원", `${totalComplaints}건`, '전학기 대비 +14%'], ['긴급 처리 SLA', '4.1일', '목표 5일 이내'], ['예상 영향 인원', '8,420명', '상위 3개 이슈 기준']].map(([label, value, note]) => <div key={label} className="rounded-lg border border-slate-200 p-4"><p className="text-sm font-semibold text-slate-500">{label}</p><p className="mt-3 text-3xl font-black text-slate-950">{value}</p><p className="mt-1 text-xs font-bold text-teal-700">{note}</p></div>)}</div>
+      <section className="rounded-lg border border-slate-200 bg-white p-5"><div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"><div><p className="text-sm font-semibold text-red-700">학기별·연말 통계</p><h2 className="mt-1 text-2xl font-black tracking-tight">민원 통계 리포트</h2><p className="mt-1 text-sm text-slate-500">카테고리, 긴급도, 처리 SLA, 영향도를 한 번에 정리합니다.</p></div><div className="flex items-center gap-2"><div className="inline-flex rounded-lg bg-slate-100 p-1">{(['2026-1학기', '연말'] as const).map((period) => <button key={period} type="button" className={cn('h-8 rounded-md px-3 text-xs font-bold transition', reportPeriod === period ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500')} onClick={() => setReportPeriod(period)}>{period}</button>)}</div><Button variant="outline" size="sm" onClick={downloadReport}><Download aria-hidden="true" />CSV</Button></div></div>
+        <div className="mt-6 grid gap-3 md:grid-cols-3">{[["접수 민원", `${totalComplaints}건`, '전학기 대비 +14%'], ['긴급 처리 SLA', '4.1일', '목표 5일 이내'], ['예상 영향 인원', '8,420명', '상위 3개 이슈 기준']].map(([label, value, note]) => <div key={label} className="rounded-lg border border-slate-200 p-4"><p className="text-sm font-semibold text-slate-500">{label}</p><p className="mt-3 text-3xl font-black text-slate-950">{value}</p><p className="mt-1 text-xs font-bold text-red-700">{note}</p></div>)}</div>
       </section>
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]"><section className="min-w-0 rounded-lg border border-slate-200 bg-white p-5"><div className="flex items-center justify-between gap-3"><div><p className="text-sm font-semibold text-slate-500">카테고리별 SLA</p><h2 className="mt-1 text-lg font-black">처리 기간과 긴급도 비교</h2></div><LineChart className="size-5 text-slate-400" aria-hidden="true" /></div><div className="mt-5 overflow-x-auto rounded-lg border border-slate-200"><table className="w-full min-w-[620px] text-left text-sm"><thead className="bg-slate-50 text-xs font-bold tracking-wide text-slate-500 uppercase"><tr><th className="px-4 py-3">카테고리</th><th className="px-4 py-3">접수</th><th className="px-4 py-3">평균 처리</th><th className="px-4 py-3">긴급</th><th className="px-4 py-3">변화</th></tr></thead><tbody className="divide-y divide-slate-100">{filteredCategoryMetrics.map((category) => <tr key={category.name}><td className="px-4 py-3 font-bold text-slate-900">{category.name}</td><td className="px-4 py-3">{category.count}건</td><td className="px-4 py-3">{category.averageDays}일</td><td className="px-4 py-3"><span className="rounded-md bg-rose-50 px-2 py-1 text-xs font-bold text-rose-700">{category.urgent}건</span></td><td className={cn('px-4 py-3 font-bold', category.delta > 0 ? 'text-rose-600' : 'text-teal-700')}>{category.delta > 0 ? '+' : ''}{category.delta}%</td></tr>)}</tbody></table></div></section>
-        <aside className="rounded-lg border border-slate-200 bg-white p-5"><div className="flex items-center gap-2"><FileBarChart className="size-5 text-teal-700" aria-hidden="true" /><div><p className="text-sm font-semibold text-slate-500">리포트 생성</p><h2 className="mt-1 text-lg font-black">관리자 검토본</h2></div></div><p className="mt-4 text-sm leading-6 text-slate-600">선택한 기간의 집계와 AI 분석 추정치를 기반으로 리포트 초안을 생성합니다.</p><Button className="mt-5 w-full" onClick={() => setReportGenerated(true)}><FileBarChart aria-hidden="true" />{reportGenerated ? '리포트 초안 갱신' : '리포트 초안 생성'}</Button>{reportGenerated ? <div className="mt-4 rounded-md bg-teal-50 p-3 text-sm font-bold text-teal-800"><CheckCircle2 className="mr-2 inline size-4" aria-hidden="true" />{reportPeriod} 운영 리포트 초안이 준비되었습니다.</div> : null}</aside></div>
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_340px]"><section className="min-w-0 rounded-lg border border-slate-200 bg-white p-5"><div className="flex items-center justify-between gap-3"><div><p className="text-sm font-semibold text-slate-500">카테고리별 SLA</p><h2 className="mt-1 text-lg font-black">처리 기간과 긴급도 비교</h2></div><LineChart className="size-5 text-slate-400" aria-hidden="true" /></div><div className="mt-5 overflow-x-auto rounded-lg border border-slate-200"><table className="w-full min-w-[620px] text-left text-sm"><thead className="bg-slate-50 text-xs font-bold tracking-wide text-slate-500 uppercase"><tr><th className="px-4 py-3">카테고리</th><th className="px-4 py-3">접수</th><th className="px-4 py-3">평균 처리</th><th className="px-4 py-3">긴급</th><th className="px-4 py-3">변화</th></tr></thead><tbody className="divide-y divide-slate-100">{filteredCategoryMetrics.map((category) => <tr key={category.name}><td className="px-4 py-3 font-bold text-slate-900">{category.name}</td><td className="px-4 py-3">{category.count}건</td><td className="px-4 py-3">{category.averageDays}일</td><td className="px-4 py-3"><span className="rounded-md bg-rose-50 px-2 py-1 text-xs font-bold text-rose-700">{category.urgent}건</span></td><td className={cn('px-4 py-3 font-bold', category.delta > 0 ? 'text-rose-600' : 'text-red-700')}>{category.delta > 0 ? '+' : ''}{category.delta}%</td></tr>)}</tbody></table></div></section>
+        <aside className="rounded-lg border border-slate-200 bg-white p-5"><div className="flex items-center gap-2"><FileBarChart className="size-5 text-red-700" aria-hidden="true" /><div><p className="text-sm font-semibold text-slate-500">리포트 생성</p><h2 className="mt-1 text-lg font-black">관리자 검토본</h2></div></div><p className="mt-4 text-sm leading-6 text-slate-600">선택한 기간의 집계와 AI 분석 추정치를 기반으로 리포트 초안을 생성합니다.</p><Button className="mt-5 w-full" onClick={() => setReportGenerated(true)}><FileBarChart aria-hidden="true" />{reportGenerated ? '리포트 초안 갱신' : '리포트 초안 생성'}</Button>{reportGenerated ? <div className="mt-4 rounded-md bg-red-50 p-3 text-sm font-bold text-red-800"><CheckCircle2 className="mr-2 inline size-4" aria-hidden="true" />{reportPeriod} 운영 리포트 초안이 준비되었습니다.</div> : null}</aside></div>
     </div>
   )
 
@@ -1364,9 +1364,9 @@ function HomePage() {
     <main className="min-h-svh bg-slate-100 text-slate-950">
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-5 py-4 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-          <div className="flex items-center gap-3"><span className="grid size-10 shrink-0 place-items-center rounded-lg bg-teal-700 text-white"><Building2 className="size-5" aria-hidden="true" /></span><div><p className="text-xs font-bold tracking-[0.16em] text-slate-500 uppercase">Campus Voice Admin</p><h1 className="text-xl font-bold tracking-tight text-slate-950 sm:text-2xl">학교 민원 통합 관제</h1></div></div>
+          <div className="flex min-w-0 items-center gap-4"><SejongUniversityLogo className="h-11 max-w-64" /><div className="h-9 border-l border-slate-200" aria-hidden="true" /><div><p className="text-xs font-bold tracking-[0.16em] text-red-700 uppercase">Sejong Campus Voice Admin</p><h1 className="text-xl font-bold tracking-tight text-slate-950 sm:text-2xl">통합 민원 관제</h1></div></div>
           <div className="flex flex-wrap items-center gap-2">
-            <label className="relative inline-flex h-9 items-center rounded-md border border-slate-200 bg-white pl-3 text-slate-700 shadow-sm transition hover:border-slate-300 focus-within:border-teal-600 focus-within:ring-2 focus-within:ring-teal-100">
+            <label className="relative inline-flex h-9 items-center rounded-md border border-slate-200 bg-white pl-3 text-slate-700 shadow-sm transition hover:border-slate-300 focus-within:border-red-600 focus-within:ring-2 focus-within:ring-red-100">
               <CalendarDays className="pointer-events-none size-4 shrink-0" aria-hidden="true" />
               <span className="sr-only">집계 학기</span>
               <select
@@ -1379,7 +1379,7 @@ function HomePage() {
                 <option value="전체 기간">전체 기간</option>
               </select>
             </label>
-            <label className="relative inline-flex h-9 items-center rounded-md border border-slate-200 bg-white pl-3 text-slate-700 shadow-sm transition hover:border-slate-300 focus-within:border-teal-600 focus-within:ring-2 focus-within:ring-teal-100">
+            <label className="relative inline-flex h-9 items-center rounded-md border border-slate-200 bg-white pl-3 text-slate-700 shadow-sm transition hover:border-slate-300 focus-within:border-red-600 focus-within:ring-2 focus-within:ring-red-100">
               <Filter className="pointer-events-none size-4 shrink-0" aria-hidden="true" />
               <span className="sr-only">집계 캠퍼스 또는 위치</span>
               <select
@@ -1396,9 +1396,9 @@ function HomePage() {
       </header>
       <div className="mx-auto grid min-w-0 w-full max-w-[1440px] gap-5 px-5 py-5 lg:grid-cols-[240px_minmax(0,1fr)] lg:px-8">
         <aside className="min-w-0 rounded-lg border border-slate-200 bg-white p-3 lg:sticky lg:top-5 lg:h-[calc(100svh-40px)]">
-          <nav className="grid gap-1" aria-label="관리자 메뉴">{navItems.map(({ id, icon: Icon, label }) => <button key={id} className={cn('flex h-10 items-center gap-3 rounded-md px-3 text-left text-sm font-semibold transition', activeView === id ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950')} type="button" onClick={() => setActiveView(id)}><Icon className="size-4" aria-hidden="true" />{label}<ChevronRight className={cn('ml-auto size-4', activeView === id ? 'text-white' : 'text-slate-300')} aria-hidden="true" /></button>)}</nav>
+          <nav className="grid gap-1" aria-label="관리자 메뉴">{navItems.map(({ id, icon: Icon, label }) => <button key={id} className={cn('flex h-10 items-center gap-3 rounded-md px-3 text-left text-sm font-semibold transition', activeView === id ? 'bg-red-800 text-white' : 'text-slate-600 hover:bg-red-50 hover:text-red-800')} type="button" onClick={() => setActiveView(id)}><Icon className="size-4" aria-hidden="true" />{label}<ChevronRight className={cn('ml-auto size-4', activeView === id ? 'text-white' : 'text-slate-300')} aria-hidden="true" /></button>)}</nav>
           <div className="mt-5 rounded-lg border border-rose-200 bg-rose-50 p-4"><div className="flex items-center gap-2 text-rose-700"><BellRing className="size-4" aria-hidden="true" /><p className="text-sm font-bold">긴급 알림</p></div><p className="mt-2 text-2xl font-black text-rose-700">{urgentTotal}</p><p className="text-xs leading-5 text-rose-700/80">AI가 고긴급 또는 민감 민원으로 분류한 관리자 확인 대상입니다.</p></div>
-          <div className="mt-4 rounded-lg bg-slate-50 p-4"><p className="text-xs font-bold text-slate-500">반복 등록 제한 큐</p><p className="mt-1 text-lg font-black text-slate-900">{repeatedUsers.filter((user) => !user.limited).length}건 대기</p><button className="mt-2 text-xs font-bold text-teal-700 hover:underline" type="button" onClick={() => setActiveView('overview')}>상세 보기</button></div>
+          <div className="mt-4 rounded-lg bg-slate-50 p-4"><p className="text-xs font-bold text-slate-500">반복 등록 제한 큐</p><p className="mt-1 text-lg font-black text-slate-900">{repeatedUsers.filter((user) => !user.limited).length}건 대기</p><button className="mt-2 text-xs font-bold text-red-700 hover:underline" type="button" onClick={() => setActiveView('overview')}>상세 보기</button></div>
         </aside>
         <section className="min-w-0">{activeContent}</section>
       </div>

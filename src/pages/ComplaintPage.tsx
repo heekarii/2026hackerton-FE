@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import '@/App.css'
+import { SejongUniversityLogo } from '@/components/SejongUniversityLogo'
 import { createComplaint } from '@/features/complaints/api/complaints'
 
 const categories = [
@@ -121,9 +122,10 @@ export function ComplaintPage() {
   return (
     <main className="app-shell">
       <section className="app-header">
+        <SejongUniversityLogo className="mb-7 h-12 max-w-xs" />
         <div>
-          <p className="eyebrow">AI Campus Voice</p>
-          <h1>캠퍼스 민원 등록</h1>
+          <p className="eyebrow">SEJONG CAMPUS VOICE</p>
+          <h1>세종대학교 민원 등록</h1>
           <p className="header-copy">
             불편사항과 개선희망사항을 분리해 남기면 AI가 민원을 자동 분류하고
             핵심 이슈와 유사 민원을 분석합니다.

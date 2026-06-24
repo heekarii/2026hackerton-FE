@@ -127,7 +127,7 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
       )}
 
       {notice && (
-        <div className="flex gap-3 rounded-xl border border-teal-200 bg-teal-50 px-3.5 py-3 text-sm text-teal-800" role="status">
+        <div className="flex gap-3 rounded-xl border border-red-200 bg-red-50 px-3.5 py-3 text-sm text-red-800" role="status">
           <CheckCircle2 className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
           <p>{notice}</p>
         </div>
@@ -137,7 +137,7 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
         <div className="flex items-center justify-between gap-3">
           <Label htmlFor="signup-email">학교 이메일</Label>
           {isVerified ? (
-            <span className="inline-flex items-center gap-1 text-xs font-semibold text-teal-700">
+            <span className="inline-flex items-center gap-1 text-xs font-semibold text-red-700">
               <BadgeCheck className="size-3.5" aria-hidden="true" /> 인증 완료
             </span>
           ) : null}
@@ -212,7 +212,7 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
         <label className="flex cursor-pointer items-start gap-2.5 text-sm leading-5 text-slate-600">
           <input
             type="checkbox"
-            className="mt-0.5 size-4 rounded border-slate-300 accent-teal-700"
+            className="mt-0.5 size-4 rounded border-slate-300 accent-red-700"
             checked={agreedToTerms}
             onChange={(event) => setAgreedToTerms(event.target.checked)}
           />
