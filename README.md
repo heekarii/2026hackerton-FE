@@ -13,8 +13,12 @@ pnpm dev
 `.env.local`에 FastAPI 서버 주소를 입력합니다.
 
 ```bash
-VITE_API_BASE_URL=http://localhost:8000
-VITE_LOGIN_ENDPOINT=/auth/login
+VITE_API_BASE_URL=https://two026hackerton-be.onrender.com
+VITE_OPENAPI_URL=https://two026hackerton-be.onrender.com/openapi.json
 ```
 
-로그인 API는 `POST /auth/login`을 기본값으로 사용합니다. FastAPI Swagger의 실제 인증 경로가 다르면 `VITE_LOGIN_ENDPOINT`만 수정하면 됩니다.
+현재 Swagger에는 `GET /`와 `GET /health`만 등록되어 있습니다. 백엔드에서 JWT 로그인 API를 Swagger에 등록한 뒤 아래처럼 실제 경로를 추가하세요.
+
+```bash
+VITE_LOGIN_ENDPOINT=/auth/login
+```

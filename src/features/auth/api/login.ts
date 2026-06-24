@@ -1,5 +1,5 @@
 import { saveAccessToken } from '@/features/auth/auth-storage'
-import { apiRequest } from '@/shared/api/client'
+import { ApiError, apiRequest } from '@/shared/api/client'
 
 export type LoginPayload = {
   email: string
@@ -12,7 +12,15 @@ export type LoginResponse = {
 }
 
 export async function login(payload: LoginPayload) {
-  const endpoint = import.meta.env.VITE_LOGIN_ENDPOINT || '/auth/login'
+  const endpoint = import.meta.env.VITE_LOGIN_ENDPOINT
+
+  if (!endpoint) {
+    throw new ApiError(
+      '로그인 API가 Swagger에 아직 등록되지 않았습니다. 백엔드에서 경로를 추가한 뒤 VITE_LOGIN_ENDPOINT를 설정해 주세요.',
+      0,
+    )
+  }
+
   const response = await apiRequest<LoginResponse>(endpoint, {
     method: 'POST',
     headers: {
