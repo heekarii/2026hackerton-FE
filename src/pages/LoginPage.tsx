@@ -21,11 +21,11 @@ export function LoginPage() {
     <main className="relative grid min-h-svh overflow-hidden bg-slate-50 lg:grid-cols-[1.1fr_0.9fr]">
       <section className="relative hidden overflow-hidden bg-red-950 px-12 py-10 text-white lg:flex lg:flex-col">
         <div className="absolute inset-y-0 right-0 w-px bg-white/15" />
-        <SejongUniversityLogo className="relative h-14 max-w-sm" tone="light" />
+        <SejongUniversityLogo className="relative -ml-16 h-14 max-w-sm" tone="light" />
 
         <div className="relative my-auto max-w-xl pb-16">
           <p className="mb-5 text-sm font-bold tracking-[0.2em] text-red-200">SEJONG CAMPUS VOICE</p>
-          <h1 className="text-5xl leading-[1.12] font-bold tracking-[-0.055em] text-balance">
+          <h1 className="text-5xl leading-[1.12] font-bold tracking-[-0.055em] text-balance text-white">
             더 나은 캠퍼스를 만드는,
             <br />
             가장 빠른 목소리
