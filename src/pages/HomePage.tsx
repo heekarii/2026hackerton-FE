@@ -138,11 +138,11 @@ const timeSlots = [
 ]
 
 const locationHotspots = [
-  { name: '공학관 B동', count: 68, x: '21%', y: '28%', category: '시설' },
-  { name: '학생회관 식당', count: 54, x: '64%', y: '43%', category: '학식' },
-  { name: '중앙도서관 3층', count: 37, x: '42%', y: '63%', category: '도서관' },
-  { name: '본관 민원실', count: 31, x: '73%', y: '22%', category: '행정' },
-  { name: '인문관 강의동', count: 29, x: '28%', y: '72%', category: '수업' },
+  { name: '공학관', building: '6번', count: 68, x: '33%', y: '48%', category: '시설' },
+  { name: '학생회관', building: '14번', count: 54, x: '70%', y: '45%', category: '학식' },
+  { name: '다산관', building: '23번', count: 37, x: '82%', y: '31%', category: '수업' },
+  { name: '집현관', building: '1번', count: 31, x: '32%', y: '72%', category: '행정' },
+  { name: '군자관', building: '5번', count: 29, x: '37%', y: '57%', category: '시설' },
 ]
 
 const similarCases: SimilarCase[] = [
@@ -492,18 +492,22 @@ function HomePage() {
                     <MapPin className="size-5 text-slate-400" aria-hidden="true" />
                   </div>
 
-                  <div className="relative mt-5 h-64 overflow-hidden rounded-lg border border-slate-200 bg-[linear-gradient(90deg,rgba(226,232,240,0.9)_1px,transparent_1px),linear-gradient(rgba(226,232,240,0.9)_1px,transparent_1px)] bg-[size:38px_38px]">
-                    <div className="absolute inset-x-8 top-12 h-9 rounded-md bg-slate-200/70" />
-                    <div className="absolute right-10 bottom-8 left-12 h-11 rounded-md bg-teal-100" />
-                    <div className="absolute top-8 bottom-8 left-1/2 w-8 -translate-x-1/2 rounded-full bg-slate-200/80" />
+                  <div className="relative mt-5 aspect-[527/458] overflow-hidden rounded-lg border border-slate-200 bg-[#edf3ea]">
+                    <img
+                      src="/campus-map.png"
+                      alt="캠퍼스 건물 배치도"
+                      className="absolute inset-0 size-full object-contain"
+                    />
                     {locationHotspots.map((spot) => (
                       <div
                         key={spot.name}
                         className="absolute -translate-x-1/2 -translate-y-1/2"
                         style={{ left: spot.x, top: spot.y }}
+                        role="img"
+                        aria-label={`${spot.name} ${spot.building}, ${spot.category} 민원 ${spot.count}건`}
                       >
-                        <span className="absolute inset-0 size-9 animate-ping rounded-full bg-rose-400/25" />
-                        <span className="relative grid size-9 place-items-center rounded-full bg-rose-600 text-xs font-black text-white shadow-lg shadow-rose-600/20">
+                        <span className="absolute inset-0 size-8 animate-ping rounded-full bg-rose-500/25 sm:size-9" />
+                        <span className="relative grid size-8 place-items-center rounded-full border-2 border-white bg-rose-600 text-[11px] font-black text-white shadow-lg shadow-rose-700/25 sm:size-9 sm:text-xs">
                           {spot.count}
                         </span>
                       </div>
@@ -513,7 +517,9 @@ function HomePage() {
                   <ul className="mt-4 grid gap-2">
                     {locationHotspots.slice(0, 3).map((spot) => (
                       <li key={spot.name} className="flex items-center justify-between gap-3 text-sm">
-                        <span className="font-semibold text-slate-700">{spot.name}</span>
+                        <span className="font-semibold text-slate-700">
+                          {spot.name} <span className="text-slate-400">{spot.building}</span>
+                        </span>
                         <span className="text-slate-500">
                           {spot.category} · {spot.count}건
                         </span>
